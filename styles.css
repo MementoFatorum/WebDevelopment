@@ -500,6 +500,13 @@ button {
   margin-bottom: 14px;
 }
 
+.ai-helper {
+  margin: -2px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .ai-response {
   display: grid;
   gap: 12px;
@@ -645,16 +652,25 @@ body.kiosk-mode .panel--ai {
 
 body.kiosk-mode .workspace {
   grid-template-columns: 1fr;
+  min-height: 100vh;
 }
 
 body.kiosk-mode .content {
   padding: 0;
+  min-height: 100vh;
+}
+
+body.kiosk-mode .details-grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-top: 0;
 }
 
 body.kiosk-mode .panel--dark {
   min-height: 100vh;
   border-radius: 0;
   border: 0;
+  box-shadow: none;
 }
 
 body.kiosk-mode .kiosk-item strong {

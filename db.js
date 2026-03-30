@@ -81,6 +81,19 @@ function initDb() {
       created_at TEXT NOT NULL,
       created_by_name TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS ai_insights (
+      id TEXT PRIMARY KEY,
+      student_email TEXT NOT NULL,
+      student_name TEXT NOT NULL,
+      source_record_type TEXT NOT NULL,
+      source_record_id TEXT NOT NULL,
+      diagnosis TEXT NOT NULL,
+      actions_json TEXT NOT NULL,
+      outlook TEXT NOT NULL,
+      raw_text TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
   `);
 
   migrateJsonIfNeeded();
@@ -133,7 +146,8 @@ function migrateJsonIfNeeded() {
     tableCount("achievements") === 0 &&
     tableCount("grades") === 0 &&
     tableCount("attendance") === 0 &&
-    tableCount("kiosk_highlights") === 0;
+    tableCount("kiosk_highlights") === 0 &&
+    tableCount("ai_insights") === 0;
 
   if (shouldMigrateSchoolData && fs.existsSync(SCHOOL_DATA_JSON)) {
     const schoolData = parseJson(fs.readFileSync(SCHOOL_DATA_JSON, "utf8"), {
@@ -316,6 +330,26 @@ function getGrades(studentEmail = null) {
   }));
 }
 
+function getGradeById(id) {
+  const row = db.prepare("SELECT * FROM grades WHERE id = ?").get(id);
+  if (!row) {
+    return null;
+  }
+
+  return {
+    id: row.id,
+    studentEmail: row.student_email,
+    studentName: row.student_name,
+    subject: row.subject,
+    score: row.score,
+    maxScore: row.max_score,
+    scorePercent: row.score_percent,
+    comment: row.comment,
+    createdAt: row.created_at,
+    createdByName: row.created_by_name
+  };
+}
+
 function getAttendance(studentEmail = null) {
   const stmt = studentEmail
     ? db.prepare("SELECT * FROM attendance WHERE student_email = ? ORDER BY created_at DESC")
@@ -340,6 +374,29 @@ function getKioskHighlights() {
     createdAt: row.created_at,
     createdByName: row.created_by_name
   }));
+}
+
+function getLatestAiInsight(studentEmail) {
+  const row = db
+    .prepare("SELECT * FROM ai_insights WHERE student_email = ? ORDER BY created_at DESC LIMIT 1")
+    .get(studentEmail);
+
+  if (!row) {
+    return null;
+  }
+
+  return {
+    id: row.id,
+    studentEmail: row.student_email,
+    studentName: row.student_name,
+    sourceRecordType: row.source_record_type,
+    sourceRecordId: row.source_record_id,
+    diagnosis: row.diagnosis,
+    actions: parseJson(row.actions_json, []),
+    outlook: row.outlook,
+    rawText: row.raw_text,
+    createdAt: row.created_at
+  };
 }
 
 function insertAnnouncement(item) {
@@ -395,8 +452,41 @@ function insertKioskHighlight(item) {
   `).run(item.id, item.title, item.body, item.createdAt, item.createdByName);
 }
 
+function insertAiInsight(item) {
+  db.prepare(`
+    INSERT INTO ai_insights (
+      id,
+      student_email,
+      student_name,
+      source_record_type,
+      source_record_id,
+      diagnosis,
+      actions_json,
+      outlook,
+      raw_text,
+      created_at
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    item.id,
+    item.studentEmail,
+    item.studentName,
+    item.sourceRecordType,
+    item.sourceRecordId,
+    item.diagnosis,
+    JSON.stringify(item.actions || []),
+    item.outlook,
+    item.rawText,
+    item.createdAt
+  );
+}
+
 function deleteAnnouncement(id) {
   return db.prepare("DELETE FROM announcements WHERE id = ?").run(id);
+}
+
+function deleteGrade(id) {
+  return db.prepare("DELETE FROM grades WHERE id = ?").run(id);
 }
 
 function deleteEvent(id) {
@@ -419,15 +509,19 @@ module.exports = {
   getEvents,
   getAchievements,
   getGrades,
+  getGradeById,
   getAttendance,
   getKioskHighlights,
+  getLatestAiInsight,
   insertAnnouncement,
   insertEvent,
   insertAchievement,
   insertGrade,
   insertAttendance,
   insertKioskHighlight,
+  insertAiInsight,
   deleteAnnouncement,
+  deleteGrade,
   deleteEvent,
   deleteKioskHighlight
 };

@@ -27,6 +27,7 @@ const elements = {
   dashboardSide: document.querySelector("#dashboard-side"),
   managementSection: document.querySelector("#manage-section"),
   aiForm: document.querySelector("#ai-form"),
+  aiDataInput: document.querySelector("#ai-data-input"),
   aiPrompt: document.querySelector("#ai-prompt"),
   aiOutput: document.querySelector("#ai-output"),
   aiStatus: document.querySelector("#ai-status"),
@@ -58,11 +59,11 @@ function currentRole() {
 
 function roleDisplayName(role) {
   const map = {
-    student: "Ученик",
-    teacher: "Учитель",
-    parent: "Родитель",
-    admin: "Администратор",
-    guest: "Гость"
+    student: "РЈС‡РµРЅРёРє",
+    teacher: "РЈС‡РёС‚РµР»СЊ",
+    parent: "Р РѕРґРёС‚РµР»СЊ",
+    admin: "РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ",
+    guest: "Р“РѕСЃС‚СЊ"
   };
   return map[role] || role;
 }
@@ -97,31 +98,31 @@ function renderRoleFields(role) {
   const templates = {
     student: `
       <label>
-        Класс
+        РљР»Р°СЃСЃ
         <input type="text" name="className" placeholder="9B" required>
       </label>
       <label>
-        ID ученика
+        ID СѓС‡РµРЅРёРєР°
         <input type="text" name="studentId" placeholder="ST-2026-001" required>
       </label>
     `,
     teacher: `
       <label>
-        Предмет
-        <input type="text" name="subject" placeholder="Математика" required>
+        РџСЂРµРґРјРµС‚
+        <input type="text" name="subject" placeholder="РњР°С‚РµРјР°С‚РёРєР°" required>
       </label>
       <label>
-        Табельный номер
+        РўР°Р±РµР»СЊРЅС‹Р№ РЅРѕРјРµСЂ
         <input type="text" name="staffId" placeholder="T-041" required>
       </label>
     `,
     parent: `
       <label>
-        Имя ребёнка
-        <input type="text" name="childName" placeholder="Алия Нуржан">
+        РРјСЏ СЂРµР±С‘РЅРєР°
+        <input type="text" name="childName" placeholder="РђР»РёСЏ РќСѓСЂР¶Р°РЅ">
       </label>
       <label>
-        Email ребёнка
+        Email СЂРµР±С‘РЅРєР°
         <input type="email" name="childEmail" placeholder="student@aqbobek.edu" required>
       </label>
     `
@@ -163,8 +164,8 @@ async function loadDashboard() {
 
 function updateUserChrome() {
   const label = state.user
-    ? `${state.user.fullName} · ${roleDisplayName(state.user.role)}`
-    : "Гость";
+    ? `${state.user.fullName} В· ${roleDisplayName(state.user.role)}`
+    : "Р“РѕСЃС‚СЊ";
 
   elements.activeUser.textContent = label;
   elements.openAuth.classList.toggle("is-hidden", Boolean(state.user));
@@ -175,24 +176,24 @@ function updateUserChrome() {
 function renderHero() {
   const content = {
     guest: {
-      title: "Единый портал школьных данных",
-      text: "Войдите в систему, чтобы увидеть персональный экран и работать только с реальными данными, добавленными в портал."
+      title: "Р•РґРёРЅС‹Р№ РїРѕСЂС‚Р°Р» С€РєРѕР»СЊРЅС‹С… РґР°РЅРЅС‹С…",
+      text: "Р’РѕР№РґРёС‚Рµ РІ СЃРёСЃС‚РµРјСѓ, С‡С‚РѕР±С‹ СѓРІРёРґРµС‚СЊ РїРµСЂСЃРѕРЅР°Р»СЊРЅС‹Р№ СЌРєСЂР°РЅ Рё СЂР°Р±РѕС‚Р°С‚СЊ С‚РѕР»СЊРєРѕ СЃ СЂРµР°Р»СЊРЅС‹РјРё РґР°РЅРЅС‹РјРё, РґРѕР±Р°РІР»РµРЅРЅС‹РјРё РІ РїРѕСЂС‚Р°Р»."
     },
     student: {
-      title: "Дашборд ученика",
-      text: "Здесь отображаются только те оценки, посещаемость и достижения, которые реально внесли учителя или администрация."
+      title: "Р”Р°С€Р±РѕСЂРґ СѓС‡РµРЅРёРєР°",
+      text: "Р—РґРµСЃСЊ РѕС‚РѕР±СЂР°Р¶Р°СЋС‚СЃСЏ С‚РѕР»СЊРєРѕ С‚Рµ РѕС†РµРЅРєРё, РїРѕСЃРµС‰Р°РµРјРѕСЃС‚СЊ Рё РґРѕСЃС‚РёР¶РµРЅРёСЏ, РєРѕС‚РѕСЂС‹Рµ СЂРµР°Р»СЊРЅРѕ РІРЅРµСЃР»Рё СѓС‡РёС‚РµР»СЏ РёР»Рё Р°РґРјРёРЅРёСЃС‚СЂР°С†РёСЏ."
     },
     parent: {
-      title: "Дашборд родителя",
-      text: "Вы видите динамику ребёнка по реальным школьным записям без скрытых или выдуманных показателей."
+      title: "Р”Р°С€Р±РѕСЂРґ СЂРѕРґРёС‚РµР»СЏ",
+      text: "Р’С‹ РІРёРґРёС‚Рµ РґРёРЅР°РјРёРєСѓ СЂРµР±С‘РЅРєР° РїРѕ СЂРµР°Р»СЊРЅС‹Рј С€РєРѕР»СЊРЅС‹Рј Р·Р°РїРёСЃСЏРј Р±РµР· СЃРєСЂС‹С‚С‹С… РёР»Рё РІС‹РґСѓРјР°РЅРЅС‹С… РїРѕРєР°Р·Р°С‚РµР»РµР№."
     },
     teacher: {
-      title: "Дашборд учителя",
-      text: "Добавляйте оценки, посещаемость и достижения учеников, а система сразу собирает единую картину класса."
+      title: "Р”Р°С€Р±РѕСЂРґ СѓС‡РёС‚РµР»СЏ",
+      text: "Р”РѕР±Р°РІР»СЏР№С‚Рµ РѕС†РµРЅРєРё, РїРѕСЃРµС‰Р°РµРјРѕСЃС‚СЊ Рё РґРѕСЃС‚РёР¶РµРЅРёСЏ СѓС‡РµРЅРёРєРѕРІ, Р° СЃРёСЃС‚РµРјР° СЃСЂР°Р·Сѓ СЃРѕР±РёСЂР°РµС‚ РµРґРёРЅСѓСЋ РєР°СЂС‚РёРЅСѓ РєР»Р°СЃСЃР°."
     },
     admin: {
-      title: "Дашборд администратора",
-      text: "Публикуйте объявления, события и контент для стенгазеты, а также контролируйте общую картину школы."
+      title: "Р”Р°С€Р±РѕСЂРґ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°",
+      text: "РџСѓР±Р»РёРєСѓР№С‚Рµ РѕР±СЉСЏРІР»РµРЅРёСЏ, СЃРѕР±С‹С‚РёСЏ Рё РєРѕРЅС‚РµРЅС‚ РґР»СЏ СЃС‚РµРЅРіР°Р·РµС‚С‹, Р° С‚Р°РєР¶Рµ РєРѕРЅС‚СЂРѕР»РёСЂСѓР№С‚Рµ РѕР±С‰СѓСЋ РєР°СЂС‚РёРЅСѓ С€РєРѕР»С‹."
     }
   };
 
@@ -206,8 +207,8 @@ function renderSummary() {
   if (!items.length) {
     elements.summaryGrid.innerHTML = `
       <article class="summary-card summary-card--empty">
-        <strong>Пока нет персональных данных</strong>
-        <p>После входа и первых записей в системе здесь появятся ключевые показатели.</p>
+        <strong>РџРѕРєР° РЅРµС‚ РїРµСЂСЃРѕРЅР°Р»СЊРЅС‹С… РґР°РЅРЅС‹С…</strong>
+        <p>РџРѕСЃР»Рµ РІС…РѕРґР° Рё РїРµСЂРІС‹С… Р·Р°РїРёСЃРµР№ РІ СЃРёСЃС‚РµРјРµ Р·РґРµСЃСЊ РїРѕСЏРІСЏС‚СЃСЏ РєР»СЋС‡РµРІС‹Рµ РїРѕРєР°Р·Р°С‚РµР»Рё.</p>
       </article>
     `;
     return;
@@ -234,7 +235,7 @@ function renderEmptyState(title, text) {
 
 function formatDate(value) {
   if (!value) {
-    return "Без даты";
+    return "Р‘РµР· РґР°С‚С‹";
   }
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
@@ -249,12 +250,14 @@ function formatDate(value) {
   });
 }
 
-function renderGradesPanel(grades, title = "Оценки") {
+function renderGradesPanel(grades, title = "РћС†РµРЅРєРё") {
+  const canDelete = ["teacher", "admin"].includes(currentRole());
+
   if (!grades?.length) {
     return `
       <article class="panel">
         <div class="panel__head"><h3>${title}</h3></div>
-        ${renderEmptyState("Пока нет оценок", "Учитель ещё не добавил записи успеваемости.")}
+        ${renderEmptyState("РџРѕРєР° РЅРµС‚ РѕС†РµРЅРѕРє", "РЈС‡РёС‚РµР»СЊ РµС‰С‘ РЅРµ РґРѕР±Р°РІРёР» Р·Р°РїРёСЃРё СѓСЃРїРµРІР°РµРјРѕСЃС‚Рё.")}
       </article>
     `;
   }
@@ -268,11 +271,12 @@ function renderGradesPanel(grades, title = "Оценки") {
             <div class="table-row">
               <div>
                 <strong>${item.subject}</strong>
-                <span>${item.studentName || "Ученик"} · ${formatDate(item.createdAt)}</span>
+                <span>${item.studentName || "РЈС‡РµРЅРёРє"} В· ${formatDate(item.createdAt)}</span>
               </div>
               <div><span class="pill pill--blue">${item.score} / ${item.maxScore}</span></div>
               <div><span class="pill ${item.scorePercent >= 75 ? "pill--green" : item.scorePercent >= 60 ? "pill--orange" : "pill--red"}">${item.scorePercent}%</span></div>
-              <div><span>${item.comment || "Без комментария"}</span></div>
+              <div><span>${item.comment || "Р‘РµР· РєРѕРјРјРµРЅС‚Р°СЂРёСЏ"}</span></div>
+              <div>${canDelete ? `<button class="record-delete" type="button" data-delete-type="grade" data-delete-id="${item.id}">РЈРґР°Р»РёС‚СЊ</button>` : ""}</div>
             </div>
           `)
           .join("")}
@@ -285,21 +289,21 @@ function renderAttendancePanel(attendance) {
   if (!attendance?.length) {
     return `
       <article class="panel">
-        <div class="panel__head"><h3>Посещаемость</h3></div>
-        ${renderEmptyState("Нет отметок посещаемости", "Учитель ещё не внёс записи посещаемости.")}
+        <div class="panel__head"><h3>РџРѕСЃРµС‰Р°РµРјРѕСЃС‚СЊ</h3></div>
+        ${renderEmptyState("РќРµС‚ РѕС‚РјРµС‚РѕРє РїРѕСЃРµС‰Р°РµРјРѕСЃС‚Рё", "РЈС‡РёС‚РµР»СЊ РµС‰С‘ РЅРµ РІРЅС‘СЃ Р·Р°РїРёСЃРё РїРѕСЃРµС‰Р°РµРјРѕСЃС‚Рё.")}
       </article>
     `;
   }
 
   return `
     <article class="panel">
-      <div class="panel__head"><h3>Посещаемость</h3></div>
+      <div class="panel__head"><h3>РџРѕСЃРµС‰Р°РµРјРѕСЃС‚СЊ</h3></div>
       <div class="feed-list">
         ${attendance
           .map((item) => `
             <article class="feed-item">
-              <strong>${item.studentName || "Ученик"} · ${item.date}</strong>
-              <p>Статус: ${item.status === "present" ? "Присутствовал" : item.status === "late" ? "Опоздал" : "Отсутствовал"}${item.comment ? `. ${item.comment}` : ""}</p>
+              <strong>${item.studentName || "РЈС‡РµРЅРёРє"} В· ${item.date}</strong>
+              <p>РЎС‚Р°С‚СѓСЃ: ${item.status === "present" ? "РџСЂРёСЃСѓС‚СЃС‚РІРѕРІР°Р»" : item.status === "late" ? "РћРїРѕР·РґР°Р»" : "РћС‚СЃСѓС‚СЃС‚РІРѕРІР°Р»"}${item.comment ? `. ${item.comment}` : ""}</p>
             </article>
           `)
           .join("")}
@@ -308,13 +312,13 @@ function renderAttendancePanel(attendance) {
   `;
 }
 
-function renderAnnouncementsPanel(items, title = "Объявления") {
+function renderAnnouncementsPanel(items, title = "РћР±СЉСЏРІР»РµРЅРёСЏ") {
   const canDelete = currentRole() === "admin";
   if (!items?.length) {
     return `
       <article class="panel">
         <div class="panel__head"><h3>${title}</h3></div>
-        ${renderEmptyState("Пока нет публикаций", "Администратор ещё не добавил новости или объявления.")}
+        ${renderEmptyState("РџРѕРєР° РЅРµС‚ РїСѓР±Р»РёРєР°С†РёР№", "РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ РµС‰С‘ РЅРµ РґРѕР±Р°РІРёР» РЅРѕРІРѕСЃС‚Рё РёР»Рё РѕР±СЉСЏРІР»РµРЅРёСЏ.")}
       </article>
     `;
   }
@@ -328,9 +332,9 @@ function renderAnnouncementsPanel(items, title = "Объявления") {
             <article class="feed-item">
               <div class="record-head">
                 <strong>${item.title}</strong>
-                ${canDelete ? `<button class="record-delete" type="button" data-delete-type="announcement" data-delete-id="${item.id}">Удалить</button>` : ""}
+                ${canDelete ? `<button class="record-delete" type="button" data-delete-type="announcement" data-delete-id="${item.id}">РЈРґР°Р»РёС‚СЊ</button>` : ""}
               </div>
-              <p>${item.body || "Без описания"}</p>
+              <p>${item.body || "Р‘РµР· РѕРїРёСЃР°РЅРёСЏ"}</p>
               <span class="meta-line">${formatDate(item.createdAt)}</span>
             </article>
           `)
@@ -344,22 +348,22 @@ function renderAchievementsPanel(items) {
   if (!items?.length) {
     return `
       <article class="panel">
-        <div class="panel__head"><h3>Достижения</h3></div>
-        ${renderEmptyState("Пока нет достижений", "Учитель или администратор ещё не добавили достижения.")}
+        <div class="panel__head"><h3>Р”РѕСЃС‚РёР¶РµРЅРёСЏ</h3></div>
+        ${renderEmptyState("РџРѕРєР° РЅРµС‚ РґРѕСЃС‚РёР¶РµРЅРёР№", "РЈС‡РёС‚РµР»СЊ РёР»Рё Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ РµС‰С‘ РЅРµ РґРѕР±Р°РІРёР»Рё РґРѕСЃС‚РёР¶РµРЅРёСЏ.")}
       </article>
     `;
   }
 
   return `
     <article class="panel">
-      <div class="panel__head"><h3>Достижения</h3></div>
+      <div class="panel__head"><h3>Р”РѕСЃС‚РёР¶РµРЅРёСЏ</h3></div>
       <div class="feed-list">
         ${items
           .map((item) => `
             <article class="feed-item">
               <strong>${item.studentName || ""} ${item.title}</strong>
-              <p>${item.body || "Без описания"}</p>
-              <span class="meta-line">Добавил: ${item.createdByName} · ${formatDate(item.createdAt)}</span>
+              <p>${item.body || "Р‘РµР· РѕРїРёСЃР°РЅРёСЏ"}</p>
+              <span class="meta-line">Р”РѕР±Р°РІРёР»: ${item.createdByName} В· ${formatDate(item.createdAt)}</span>
             </article>
           `)
           .join("")}
@@ -372,22 +376,22 @@ function renderRiskPanel(items) {
   if (!items?.length) {
     return `
       <article class="panel">
-        <div class="panel__head"><h3>Зона риска</h3></div>
-        ${renderEmptyState("Критических сигналов нет", "По текущим данным система не видит учеников в зоне риска.")}
+        <div class="panel__head"><h3>Р—РѕРЅР° СЂРёСЃРєР°</h3></div>
+        ${renderEmptyState("РљСЂРёС‚РёС‡РµСЃРєРёС… СЃРёРіРЅР°Р»РѕРІ РЅРµС‚", "РџРѕ С‚РµРєСѓС‰РёРј РґР°РЅРЅС‹Рј СЃРёСЃС‚РµРјР° РЅРµ РІРёРґРёС‚ СѓС‡РµРЅРёРєРѕРІ РІ Р·РѕРЅРµ СЂРёСЃРєР°.")}
       </article>
     `;
   }
 
   return `
     <article class="panel">
-      <div class="panel__head"><h3>Зона риска</h3></div>
+      <div class="panel__head"><h3>Р—РѕРЅР° СЂРёСЃРєР°</h3></div>
       <div class="feed-list">
         ${items
           .map((item) => `
             <article class="feed-item">
-              <strong>${item.studentName} · ${item.className}</strong>
+              <strong>${item.studentName} В· ${item.className}</strong>
               <p>${item.note}</p>
-              <span class="meta-line">Уровень: ${item.riskLevel === "high" ? "Высокий" : "Средний"}</span>
+              <span class="meta-line">РЈСЂРѕРІРµРЅСЊ: ${item.riskLevel === "high" ? "Р’С‹СЃРѕРєРёР№" : "РЎСЂРµРґРЅРёР№"}</span>
             </article>
           `)
           .join("")}
@@ -401,24 +405,24 @@ function renderEventsPanel(items) {
   if (!items?.length) {
     return `
       <article class="panel">
-        <div class="panel__head"><h3>События</h3></div>
-        ${renderEmptyState("Пока нет событий", "Администратор ещё не опубликовал школьные события.")}
+        <div class="panel__head"><h3>РЎРѕР±С‹С‚РёСЏ</h3></div>
+        ${renderEmptyState("РџРѕРєР° РЅРµС‚ СЃРѕР±С‹С‚РёР№", "РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ РµС‰С‘ РЅРµ РѕРїСѓР±Р»РёРєРѕРІР°Р» С€РєРѕР»СЊРЅС‹Рµ СЃРѕР±С‹С‚РёСЏ.")}
       </article>
     `;
   }
 
   return `
     <article class="panel">
-      <div class="panel__head"><h3>События</h3></div>
+      <div class="panel__head"><h3>РЎРѕР±С‹С‚РёСЏ</h3></div>
       <div class="feed-list">
         ${items
           .map((item) => `
             <article class="feed-item">
               <div class="record-head">
                 <strong>${item.title}</strong>
-                ${canDelete ? `<button class="record-delete" type="button" data-delete-type="event" data-delete-id="${item.id}">Удалить</button>` : ""}
+                ${canDelete ? `<button class="record-delete" type="button" data-delete-type="event" data-delete-id="${item.id}">РЈРґР°Р»РёС‚СЊ</button>` : ""}
               </div>
-              <p>${item.body || "Без описания"}</p>
+              <p>${item.body || "Р‘РµР· РѕРїРёСЃР°РЅРёСЏ"}</p>
               <span class="meta-line">${item.eventDate}</span>
             </article>
           `)
@@ -431,17 +435,17 @@ function renderEventsPanel(items) {
 function renderGuestDashboard() {
   elements.dashboardMain.innerHTML = `
     <article class="panel">
-      <div class="panel__head"><h3>Добро пожаловать</h3></div>
-      ${renderEmptyState("Войдите в портал", "После входа вы увидите свой ролевой дашборд и реальные записи системы.")}
+      <div class="panel__head"><h3>Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ</h3></div>
+      ${renderEmptyState("Р’РѕР№РґРёС‚Рµ РІ РїРѕСЂС‚Р°Р»", "РџРѕСЃР»Рµ РІС…РѕРґР° РІС‹ СѓРІРёРґРёС‚Рµ СЃРІРѕР№ СЂРѕР»РµРІРѕР№ РґР°С€Р±РѕСЂРґ Рё СЂРµР°Р»СЊРЅС‹Рµ Р·Р°РїРёСЃРё СЃРёСЃС‚РµРјС‹.")}
     </article>
   `;
   elements.dashboardSide.innerHTML = `
     <article class="panel">
-      <div class="panel__head"><h3>Как устроен портал</h3></div>
+      <div class="panel__head"><h3>РљР°Рє СѓСЃС‚СЂРѕРµРЅ РїРѕСЂС‚Р°Р»</h3></div>
       <div class="feed-list">
-        <article class="feed-item"><strong>Учитель</strong><p>Добавляет оценки, посещаемость и достижения.</p></article>
-        <article class="feed-item"><strong>Администратор</strong><p>Публикует объявления, события и материалы стенгазеты.</p></article>
-        <article class="feed-item"><strong>Ученик и родитель</strong><p>Видят только реальные записи, которые уже внесены в систему.</p></article>
+        <article class="feed-item"><strong>РЈС‡РёС‚РµР»СЊ</strong><p>Р”РѕР±Р°РІР»СЏРµС‚ РѕС†РµРЅРєРё, РїРѕСЃРµС‰Р°РµРјРѕСЃС‚СЊ Рё РґРѕСЃС‚РёР¶РµРЅРёСЏ.</p></article>
+        <article class="feed-item"><strong>РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ</strong><p>РџСѓР±Р»РёРєСѓРµС‚ РѕР±СЉСЏРІР»РµРЅРёСЏ, СЃРѕР±С‹С‚РёСЏ Рё РјР°С‚РµСЂРёР°Р»С‹ СЃС‚РµРЅРіР°Р·РµС‚С‹.</p></article>
+        <article class="feed-item"><strong>РЈС‡РµРЅРёРє Рё СЂРѕРґРёС‚РµР»СЊ</strong><p>Р’РёРґСЏС‚ С‚РѕР»СЊРєРѕ СЂРµР°Р»СЊРЅС‹Рµ Р·Р°РїРёСЃРё, РєРѕС‚РѕСЂС‹Рµ СѓР¶Рµ РІРЅРµСЃРµРЅС‹ РІ СЃРёСЃС‚РµРјСѓ.</p></article>
       </div>
     </article>
   `;
@@ -449,7 +453,7 @@ function renderGuestDashboard() {
 
 function renderStudentDashboard(records) {
   elements.dashboardMain.innerHTML = [
-    renderGradesPanel(records.grades, "Мои оценки"),
+    renderGradesPanel(records.grades, "РњРѕРё РѕС†РµРЅРєРё"),
     renderAttendancePanel(records.attendance)
   ].join("");
 
@@ -464,23 +468,23 @@ function renderParentDashboard(records) {
   const childPanel = records.child
     ? `
       <article class="panel">
-        <div class="panel__head"><h3>Связанный ребёнок</h3></div>
+        <div class="panel__head"><h3>РЎРІСЏР·Р°РЅРЅС‹Р№ СЂРµР±С‘РЅРѕРє</h3></div>
         <div class="feed-item">
           <strong>${records.child.fullName}</strong>
-          <p>Класс: ${records.child.className || "Не указан"}</p>
+          <p>РљР»Р°СЃСЃ: ${records.child.className || "РќРµ СѓРєР°Р·Р°РЅ"}</p>
         </div>
       </article>
     `
     : `
       <article class="panel">
-        <div class="panel__head"><h3>Связанный ребёнок</h3></div>
-        ${renderEmptyState("Ребёнок не найден", "Проверьте email ребёнка в профиле регистрации.")}
+        <div class="panel__head"><h3>РЎРІСЏР·Р°РЅРЅС‹Р№ СЂРµР±С‘РЅРѕРє</h3></div>
+        ${renderEmptyState("Р РµР±С‘РЅРѕРє РЅРµ РЅР°Р№РґРµРЅ", "РџСЂРѕРІРµСЂСЊС‚Рµ email СЂРµР±С‘РЅРєР° РІ РїСЂРѕС„РёР»Рµ СЂРµРіРёСЃС‚СЂР°С†РёРё.")}
       </article>
     `;
 
   elements.dashboardMain.innerHTML = [
     childPanel,
-    renderGradesPanel(records.grades, "Успеваемость ребёнка"),
+    renderGradesPanel(records.grades, "РЈСЃРїРµРІР°РµРјРѕСЃС‚СЊ СЂРµР±С‘РЅРєР°"),
     renderAttendancePanel(records.attendance)
   ].join("");
 
@@ -494,7 +498,7 @@ function renderParentDashboard(records) {
 function renderTeacherDashboard(records) {
   elements.dashboardMain.innerHTML = [
     renderRiskPanel(records.riskList),
-    renderGradesPanel(records.grades, "Последние внесённые оценки"),
+    renderGradesPanel(records.grades, "РџРѕСЃР»РµРґРЅРёРµ РІРЅРµСЃС‘РЅРЅС‹Рµ РѕС†РµРЅРєРё"),
     renderAttendancePanel(records.attendance)
   ].join("");
 
@@ -507,13 +511,13 @@ function renderTeacherDashboard(records) {
 
 function renderAdminDashboard(records) {
   elements.dashboardMain.innerHTML = [
-    renderAnnouncementsPanel(records.announcements, "Новости и объявления"),
+    renderAnnouncementsPanel(records.announcements, "РќРѕРІРѕСЃС‚Рё Рё РѕР±СЉСЏРІР»РµРЅРёСЏ"),
     renderEventsPanel(records.events),
     renderRiskPanel(records.riskList)
   ].join("");
 
   elements.dashboardSide.innerHTML = [
-    renderGradesPanel(records.grades, "Последние оценки"),
+    renderGradesPanel(records.grades, "РџРѕСЃР»РµРґРЅРёРµ РѕС†РµРЅРєРё"),
     renderAchievementsPanel(records.achievements)
   ].join("");
 }
@@ -521,11 +525,11 @@ function renderAdminDashboard(records) {
 function buildStudentOptions() {
   const students = state.dashboard?.students || [];
   if (!students.length) {
-    return `<option value="">Сначала зарегистрируйте учеников</option>`;
+    return `<option value="">РЎРЅР°С‡Р°Р»Р° Р·Р°СЂРµРіРёСЃС‚СЂРёСЂСѓР№С‚Рµ СѓС‡РµРЅРёРєРѕРІ</option>`;
   }
 
   return students
-    .map((student) => `<option value="${student.email}">${student.fullName}${student.className ? ` · ${student.className}` : ""}</option>`)
+    .map((student) => `<option value="${student.email}">${student.fullName}${student.className ? ` В· ${student.className}` : ""}</option>`)
     .join("");
 }
 
@@ -551,96 +555,96 @@ function renderManagementSection() {
   const studentOptions = buildStudentOptions();
   const teacherForms = [
     managementFormCard(
-      "Добавить оценку",
+      "Р”РѕР±Р°РІРёС‚СЊ РѕС†РµРЅРєСѓ",
       `
-        <label>Ученик<select name="studentEmail" required>${studentOptions}</select></label>
-        <label>Предмет<input type="text" name="subject" placeholder="Математика" required></label>
+        <label>РЈС‡РµРЅРёРє<select name="studentEmail" required>${studentOptions}</select></label>
+        <label>РџСЂРµРґРјРµС‚<input type="text" name="subject" placeholder="РњР°С‚РµРјР°С‚РёРєР°" required></label>
         <div class="manage-form__split">
-          <label>Балл<input type="number" name="score" min="0" required></label>
-          <label>Максимум<input type="number" name="maxScore" min="1" required></label>
+          <label>Р‘Р°Р»Р»<input type="number" name="score" min="0" required></label>
+          <label>РњР°РєСЃРёРјСѓРј<input type="number" name="maxScore" min="1" required></label>
         </div>
-        <label>Комментарий<input type="text" name="comment" placeholder="Что стоит подтянуть"></label>
+        <label>РљРѕРјРјРµРЅС‚Р°СЂРёР№<input type="text" name="comment" placeholder="Р§С‚Рѕ СЃС‚РѕРёС‚ РїРѕРґС‚СЏРЅСѓС‚СЊ"></label>
       `,
       "grade",
-      "Сохранить оценку"
+      "РЎРѕС…СЂР°РЅРёС‚СЊ РѕС†РµРЅРєСѓ"
     ),
     managementFormCard(
-      "Отметить посещаемость",
+      "РћС‚РјРµС‚РёС‚СЊ РїРѕСЃРµС‰Р°РµРјРѕСЃС‚СЊ",
       `
-        <label>Ученик<select name="studentEmail" required>${studentOptions}</select></label>
+        <label>РЈС‡РµРЅРёРє<select name="studentEmail" required>${studentOptions}</select></label>
         <div class="manage-form__split">
-          <label>Дата<input type="date" name="date" required></label>
-          <label>Статус
+          <label>Р”Р°С‚Р°<input type="date" name="date" required></label>
+          <label>РЎС‚Р°С‚СѓСЃ
             <select name="status" required>
-              <option value="present">Присутствовал</option>
-              <option value="late">Опоздал</option>
-              <option value="absent">Отсутствовал</option>
+              <option value="present">РџСЂРёСЃСѓС‚СЃС‚РІРѕРІР°Р»</option>
+              <option value="late">РћРїРѕР·РґР°Р»</option>
+              <option value="absent">РћС‚СЃСѓС‚СЃС‚РІРѕРІР°Р»</option>
             </select>
           </label>
         </div>
-        <label>Комментарий<input type="text" name="comment" placeholder="Причина или пояснение"></label>
+        <label>РљРѕРјРјРµРЅС‚Р°СЂРёР№<input type="text" name="comment" placeholder="РџСЂРёС‡РёРЅР° РёР»Рё РїРѕСЏСЃРЅРµРЅРёРµ"></label>
       `,
       "attendance",
-      "Сохранить посещаемость"
+      "РЎРѕС…СЂР°РЅРёС‚СЊ РїРѕСЃРµС‰Р°РµРјРѕСЃС‚СЊ"
     ),
     managementFormCard(
-      "Добавить достижение",
+      "Р”РѕР±Р°РІРёС‚СЊ РґРѕСЃС‚РёР¶РµРЅРёРµ",
       `
-        <label>Ученик<select name="studentEmail" required>${studentOptions}</select></label>
-        <label>Заголовок<input type="text" name="title" placeholder="Победа в олимпиаде" required></label>
-        <label>Описание<textarea name="body" rows="3" placeholder="Короткое описание достижения"></textarea></label>
+        <label>РЈС‡РµРЅРёРє<select name="studentEmail" required>${studentOptions}</select></label>
+        <label>Р—Р°РіРѕР»РѕРІРѕРє<input type="text" name="title" placeholder="РџРѕР±РµРґР° РІ РѕР»РёРјРїРёР°РґРµ" required></label>
+        <label>РћРїРёСЃР°РЅРёРµ<textarea name="body" rows="3" placeholder="РљРѕСЂРѕС‚РєРѕРµ РѕРїРёСЃР°РЅРёРµ РґРѕСЃС‚РёР¶РµРЅРёСЏ"></textarea></label>
       `,
       "achievement",
-      "Сохранить достижение"
+      "РЎРѕС…СЂР°РЅРёС‚СЊ РґРѕСЃС‚РёР¶РµРЅРёРµ"
     )
   ];
 
   const adminForms = [
     managementFormCard(
-      "Опубликовать объявление",
+      "РћРїСѓР±Р»РёРєРѕРІР°С‚СЊ РѕР±СЉСЏРІР»РµРЅРёРµ",
       `
-        <label>Заголовок<input type="text" name="title" placeholder="Родительское собрание" required></label>
-        <label>Текст<textarea name="body" rows="3" placeholder="Текст объявления" required></textarea></label>
-        <label>Аудитория
+        <label>Р—Р°РіРѕР»РѕРІРѕРє<input type="text" name="title" placeholder="Р РѕРґРёС‚РµР»СЊСЃРєРѕРµ СЃРѕР±СЂР°РЅРёРµ" required></label>
+        <label>РўРµРєСЃС‚<textarea name="body" rows="3" placeholder="РўРµРєСЃС‚ РѕР±СЉСЏРІР»РµРЅРёСЏ" required></textarea></label>
+        <label>РђСѓРґРёС‚РѕСЂРёСЏ
           <select name="audience">
-            <option value="school">Вся школа</option>
-            <option value="students">Ученики</option>
-            <option value="parents">Родители</option>
-            <option value="teachers">Учителя</option>
+            <option value="school">Р’СЃСЏ С€РєРѕР»Р°</option>
+            <option value="students">РЈС‡РµРЅРёРєРё</option>
+            <option value="parents">Р РѕРґРёС‚РµР»Рё</option>
+            <option value="teachers">РЈС‡РёС‚РµР»СЏ</option>
           </select>
         </label>
       `,
       "announcement",
-      "Опубликовать объявление"
+      "РћРїСѓР±Р»РёРєРѕРІР°С‚СЊ РѕР±СЉСЏРІР»РµРЅРёРµ"
     ),
     managementFormCard(
-      "Добавить событие",
+      "Р”РѕР±Р°РІРёС‚СЊ СЃРѕР±С‹С‚РёРµ",
       `
-        <label>Название<input type="text" name="title" placeholder="STEM Week" required></label>
+        <label>РќР°Р·РІР°РЅРёРµ<input type="text" name="title" placeholder="STEM Week" required></label>
         <div class="manage-form__split">
-          <label>Дата<input type="date" name="eventDate" required></label>
+          <label>Р”Р°С‚Р°<input type="date" name="eventDate" required></label>
           <span></span>
         </div>
-        <label>Описание<textarea name="body" rows="3" placeholder="Что будет происходить"></textarea></label>
+        <label>РћРїРёСЃР°РЅРёРµ<textarea name="body" rows="3" placeholder="Р§С‚Рѕ Р±СѓРґРµС‚ РїСЂРѕРёСЃС…РѕРґРёС‚СЊ"></textarea></label>
       `,
       "event",
-      "Сохранить событие"
+      "РЎРѕС…СЂР°РЅРёС‚СЊ СЃРѕР±С‹С‚РёРµ"
     ),
     managementFormCard(
-      "Карточка для стенгазеты",
+      "РљР°СЂС‚РѕС‡РєР° РґР»СЏ СЃС‚РµРЅРіР°Р·РµС‚С‹",
       `
-        <label>Заголовок<input type="text" name="title" placeholder="Топ ученица недели" required></label>
-        <label>Описание<textarea name="body" rows="3" placeholder="Краткий текст для общего экрана"></textarea></label>
+        <label>Р—Р°РіРѕР»РѕРІРѕРє<input type="text" name="title" placeholder="РўРѕРї СѓС‡РµРЅРёС†Р° РЅРµРґРµР»Рё" required></label>
+        <label>РћРїРёСЃР°РЅРёРµ<textarea name="body" rows="3" placeholder="РљСЂР°С‚РєРёР№ С‚РµРєСЃС‚ РґР»СЏ РѕР±С‰РµРіРѕ СЌРєСЂР°РЅР°"></textarea></label>
       `,
       "kiosk",
-      "Добавить в стенгазету"
+      "Р”РѕР±Р°РІРёС‚СЊ РІ СЃС‚РµРЅРіР°Р·РµС‚Сѓ"
     )
   ];
 
   elements.managementSection.innerHTML = `
     <div class="management-header">
-      <p class="eyebrow">Управление данными</p>
-      <h2>${role === "teacher" ? "Учитель добавляет реальные записи класса" : "Администратор управляет публикациями школы"}</h2>
+      <p class="eyebrow">РЈРїСЂР°РІР»РµРЅРёРµ РґР°РЅРЅС‹РјРё</p>
+      <h2>${role === "teacher" ? "РЈС‡РёС‚РµР»СЊ РґРѕР±Р°РІР»СЏРµС‚ СЂРµР°Р»СЊРЅС‹Рµ Р·Р°РїРёСЃРё РєР»Р°СЃСЃР°" : "РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ СѓРїСЂР°РІР»СЏРµС‚ РїСѓР±Р»РёРєР°С†РёСЏРјРё С€РєРѕР»С‹"}</h2>
     </div>
     <div class="management-grid">
       ${(role === "teacher" ? teacherForms : adminForms).join("")}
@@ -660,6 +664,7 @@ function renderDashboard() {
     renderGuestDashboard();
     renderManagementSection();
     renderKiosk();
+    renderStoredInsight(null);
     return;
   }
 
@@ -677,33 +682,83 @@ function renderDashboard() {
 
   renderManagementSection();
   renderKiosk();
+
+  if (role === "student" || role === "parent") {
+    renderStoredInsight(records.latestInsight || null);
+  } else {
+    renderStoredInsight(null);
+  }
 }
 
 function renderAiResponse(result) {
   const sections = result.sections || {
     diagnosis: result.text,
     actions: [],
-    outlook: "Продолжайте отслеживать изменения в системе."
+    outlook: "РџСЂРѕРґРѕР»Р¶Р°Р№С‚Рµ РѕС‚СЃР»РµР¶РёРІР°С‚СЊ РёР·РјРµРЅРµРЅРёСЏ РІ СЃРёСЃС‚РµРјРµ."
   };
 
   elements.aiOutput.innerHTML = `
     <div class="ai-response">
       <article class="ai-response__card">
-        <span class="ai-response__label">Диагноз</span>
-        <div class="ai-response__text">${formatAiText(sections.diagnosis || "Недостаточно данных")}</div>
+        <span class="ai-response__label">Р”РёР°РіРЅРѕР·</span>
+        <div class="ai-response__text">${formatAiText(sections.diagnosis || "РќРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РґР°РЅРЅС‹С…")}</div>
       </article>
       <article class="ai-response__card">
-        <span class="ai-response__label">Действия на неделю</span>
+        <span class="ai-response__label">Р”РµР№СЃС‚РІРёСЏ РЅР° РЅРµРґРµР»СЋ</span>
         <ul class="ai-response__list">
-          ${(sections.actions || []).map((item) => `<li>${formatAiText(item)}</li>`).join("") || "<li>Нет конкретных действий.</li>"}
+          ${(sections.actions || []).map((item) => `<li>${formatAiText(item)}</li>`).join("") || "<li>РќРµС‚ РєРѕРЅРєСЂРµС‚РЅС‹С… РґРµР№СЃС‚РІРёР№.</li>"}
         </ul>
       </article>
       <article class="ai-response__card">
-        <span class="ai-response__label">Профориентация / мотивация</span>
-        <div class="ai-response__text">${formatAiText(sections.outlook || "Продолжайте развивать сильные стороны.")}</div>
+        <span class="ai-response__label">РџСЂРѕС„РѕСЂРёРµРЅС‚Р°С†РёСЏ / РјРѕС‚РёРІР°С†РёСЏ</span>
+        <div class="ai-response__text">${formatAiText(sections.outlook || "РџСЂРѕРґРѕР»Р¶Р°Р№С‚Рµ СЂР°Р·РІРёРІР°С‚СЊ СЃРёР»СЊРЅС‹Рµ СЃС‚РѕСЂРѕРЅС‹.")}</div>
       </article>
     </div>
   `;
+}
+
+function renderStoredInsight(insight) {
+  if (!insight) {
+    elements.aiStatus.textContent = "Mock";
+    elements.aiOutput.innerHTML = `
+      <strong>Р§С‚Рѕ СѓРјРµРµС‚ Р±Р»РѕРє</strong>
+      <p>Р‘РµСЂС‘С‚ СЂРµР°Р»СЊРЅС‹Рµ Р·Р°РїРёСЃРё РїРѕСЂС‚Р°Р»Р° РїРѕ С‚РµРєСѓС‰РµРјСѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ Рё С„РѕСЂРјРёСЂСѓРµС‚ СЃС‚СЂСѓРєС‚СѓСЂРёСЂРѕРІР°РЅРЅС‹Рµ СЂРµРєРѕРјРµРЅРґР°С†РёРё.</p>
+    `;
+    return;
+  }
+
+  elements.aiStatus.textContent = `Auto В· ${new Date(insight.createdAt).toLocaleString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  })}`;
+
+  renderAiResponse({
+    sections: {
+      diagnosis: insight.diagnosis,
+      actions: insight.actions || [],
+      outlook: insight.outlook
+    }
+  });
+}
+
+function parseManualGrades(input) {
+  const text = String(input || "");
+  const subjectMatches = [...text.matchAll(/([\p{L}][\p{L}\s]{1,30})[:\- ]+((?:\d{1,3}(?:[.,]\d+)?)(?:\s*[,/;]\s*\d{1,3}(?:[.,]\d+)?)*)/gu)];
+
+  return subjectMatches.flatMap((match) => {
+    const subject = match[1].trim();
+    const numbers = match[2]
+      .split(/[,/;]+/)
+      .map((value) => Number(value.trim().replace(",", ".")))
+      .filter((value) => Number.isFinite(value));
+
+    return numbers.map((scorePercent) => ({
+      subject,
+      scorePercent
+    }));
+  });
 }
 
 function escapeHtml(value) {
@@ -727,25 +782,29 @@ async function requestAiAdvice(customPrompt) {
   elements.aiStatus.textContent = "Loading";
 
   const records = state.dashboard?.records || {};
-  const grades = (records.grades || []).map((item) => ({
+  const portalGrades = (records.grades || []).map((item) => ({
     subject: item.subject,
     scorePercent: item.scorePercent
   }));
+  const manualContext = elements.aiDataInput?.value.trim() || "";
+  const manualGrades = parseManualGrades(manualContext);
+  const grades = [...portalGrades, ...manualGrades];
 
   try {
     const result = await apiRequest("/api/ai-advice", {
       role: currentRole(),
       prompt: customPrompt,
       grades,
+      manualContext,
       attendance: records.attendance || [],
       achievements: records.achievements || [],
       events: state.dashboard?.events || []
     });
 
     elements.aiStatus.textContent = result.source === "gemini"
-      ? `Gemini · ${result.model}`
+      ? `Gemini В· ${result.model}`
       : result.source === "openai"
-        ? `OpenAI · ${result.model}`
+        ? `OpenAI В· ${result.model}`
         : "Fallback";
     renderAiResponse(result);
   } catch (error) {
@@ -753,7 +812,7 @@ async function requestAiAdvice(customPrompt) {
     elements.aiOutput.innerHTML = `
       <div class="ai-response">
         <article class="ai-response__card ai-response__card--error">
-          <span class="ai-response__label">Ошибка AI</span>
+          <span class="ai-response__label">РћС€РёР±РєР° AI</span>
           <strong>${error.message}</strong>
         </article>
       </div>
@@ -765,8 +824,8 @@ function renderKiosk() {
   const items = state.dashboard?.kioskHighlights || [];
   if (!items.length) {
     elements.kioskFeed.innerHTML = renderEmptyState(
-      "Стенгазета пока пуста",
-      "Администратор ещё не добавил карточки для общего экрана."
+      "РЎС‚РµРЅРіР°Р·РµС‚Р° РїРѕРєР° РїСѓСЃС‚Р°",
+      "РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ РµС‰С‘ РЅРµ РґРѕР±Р°РІРёР» РєР°СЂС‚РѕС‡РєРё РґР»СЏ РѕР±С‰РµРіРѕ СЌРєСЂР°РЅР°."
     );
     return;
   }
@@ -776,9 +835,9 @@ function renderKiosk() {
       <article class="kiosk-item">
         <div class="record-head">
           <strong>${item.title}</strong>
-          ${currentRole() === "admin" ? `<button class="record-delete record-delete--dark" type="button" data-delete-type="kiosk" data-delete-id="${item.id}">Удалить</button>` : ""}
+          ${currentRole() === "admin" ? `<button class="record-delete record-delete--dark" type="button" data-delete-type="kiosk" data-delete-id="${item.id}">РЈРґР°Р»РёС‚СЊ</button>` : ""}
         </div>
-        <p>${item.body || "Без описания"}</p>
+        <p>${item.body || "Р‘РµР· РѕРїРёСЃР°РЅРёСЏ"}</p>
       </article>
     `)
     .join("");
@@ -921,8 +980,8 @@ async function logoutUser() {
   clearStoredUser();
   elements.aiStatus.textContent = "Mock";
   elements.aiOutput.innerHTML = `
-    <strong>Что умеет блок</strong>
-    <p>Берёт реальные записи портала по текущему пользователю и формирует структурированные рекомендации.</p>
+    <strong>Р§С‚Рѕ СѓРјРµРµС‚ Р±Р»РѕРє</strong>
+    <p>Р‘РµСЂС‘С‚ СЂРµР°Р»СЊРЅС‹Рµ Р·Р°РїРёСЃРё РїРѕСЂС‚Р°Р»Р° РїРѕ С‚РµРєСѓС‰РµРјСѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ Рё С„РѕСЂРјРёСЂСѓРµС‚ СЃС‚СЂСѓРєС‚СѓСЂРёСЂРѕРІР°РЅРЅС‹Рµ СЂРµРєРѕРјРµРЅРґР°С†РёРё.</p>
   `;
   await loadDashboard();
 }
@@ -984,10 +1043,10 @@ function bindEvents() {
   elements.registerForm?.addEventListener("submit", registerUser);
   elements.aiForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
-    await requestAiAdvice(elements.aiPrompt.value.trim() || "Проанализируй текущие записи и предложи план действий на неделю.");
+    await requestAiAdvice(elements.aiPrompt.value.trim() || "РџСЂРѕР°РЅР°Р»РёР·РёСЂСѓР№ С‚РµРєСѓС‰РёРµ Р·Р°РїРёСЃРё Рё РїСЂРµРґР»РѕР¶Рё РїР»Р°РЅ РґРµР№СЃС‚РІРёР№ РЅР° РЅРµРґРµР»СЋ.");
   });
   elements.refreshAi?.addEventListener("click", async () => {
-    await requestAiAdvice("Проанализируй текущие данные пользователя и выдели ближайшие действия.");
+    await requestAiAdvice("РџСЂРѕР°РЅР°Р»РёР·РёСЂСѓР№ С‚РµРєСѓС‰РёРµ РґР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Рё РІС‹РґРµР»Рё Р±Р»РёР¶Р°Р№С€РёРµ РґРµР№СЃС‚РІРёСЏ.");
   });
   elements.toggleKiosk?.addEventListener("click", toggleKioskMode);
   document.addEventListener("click", handleDocumentClick);
@@ -1007,3 +1066,4 @@ async function init() {
 }
 
 init();
+

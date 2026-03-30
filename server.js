@@ -13,15 +13,19 @@ const {
   getEvents,
   getAchievements,
   getGrades,
+  getGradeById,
   getAttendance,
   getKioskHighlights,
+  getLatestAiInsight,
   insertAnnouncement,
   insertEvent,
   insertAchievement,
   insertGrade,
   insertAttendance,
   insertKioskHighlight,
+  insertAiInsight,
   deleteAnnouncement,
+  deleteGrade,
   deleteEvent,
   deleteKioskHighlight
 } = require("./db");
@@ -120,27 +124,27 @@ function validateRegistration(payload) {
   const profile = payload.profile || {};
 
   if (!fullName || !email || !password || !role) {
-    return "Заполните обязательные поля.";
+    return "��������� ������������ ����.";
   }
 
   if (password.length < 6) {
-    return "Пароль должен содержать минимум 6 символов.";
+    return "������ ������ ��������� ������� 6 ��������.";
   }
 
   if (!["student", "teacher", "parent"].includes(role)) {
-    return "Некорректная роль.";
+    return "������������ ����.";
   }
 
   if (role === "student" && (!profile.className || !profile.studentId)) {
-    return "Для ученика нужны класс и ID ученика.";
+    return "��� ������� ����� ����� � ID �������.";
   }
 
   if (role === "teacher" && (!profile.subject || !profile.staffId)) {
-    return "Для учителя нужны предмет и табельный номер.";
+    return "��� ������� ����� ������� � ��������� �����.";
   }
 
   if (role === "parent" && !profile.childEmail) {
-    return "Для родителя нужен email ребёнка.";
+    return "��� �������� ����� email ������.";
   }
 
   return null;
@@ -189,20 +193,20 @@ function parseAiSections(text) {
   let current = "diagnosis";
 
   lines.forEach((line) => {
-    const clean = line.replace(/^\d+[\.\)]\s*/, "").replace(/^[-•]\s*/, "");
+    const clean = line.replace(/^\d+[\.\)]\s*/, "").replace(/^[-�]\s*/, "");
     const lower = clean.toLowerCase();
 
-    if (lower.includes("диагноз")) {
+    if (lower.includes("�������")) {
       current = "diagnosis";
       return;
     }
 
-    if (lower.includes("действ") || lower.includes("шаг")) {
+    if (lower.includes("������") || lower.includes("���")) {
       current = "actions";
       return;
     }
 
-    if (lower.includes("профориента") || lower.includes("мотивац")) {
+    if (lower.includes("�����������") || lower.includes("�������")) {
       current = "outlook";
       return;
     }
@@ -221,15 +225,15 @@ function parseAiSections(text) {
   });
 
   if (!sections.actions.length) {
-    sections.actions = lines.slice(0, 3).map((line) => line.replace(/^[-•]\s*/, ""));
+    sections.actions = lines.slice(0, 3).map((line) => line.replace(/^[-�]\s*/, ""));
   }
 
   if (!sections.diagnosis) {
-    sections.diagnosis = normalized || "Пока недостаточно данных для анализа.";
+    sections.diagnosis = normalized || "���� ������������ ������ ��� �������.";
   }
 
   if (!sections.outlook) {
-    sections.outlook = "Продолжайте добавлять реальные записи и пересматривать план каждую неделю.";
+    sections.outlook = "����������� ��������� �������� ������ � �������������� ���� ������ ������.";
   }
 
   return sections;
@@ -240,23 +244,26 @@ function buildFallbackAdvice(payload) {
   const weakest = [...grades].sort((a, b) => a.scorePercent - b.scorePercent)[0];
   const strongest = [...grades].sort((a, b) => b.scorePercent - a.scorePercent)[0];
   const role = payload.role || "student";
+  const manualContext = String(payload.manualContext || "").trim();
 
   const byRole = {
-    student: `Опирайся на сильный предмет ${strongest?.subject || "без явного лидера"} и усиливай ${weakest?.subject || "пока без записей"} через короткие регулярные практики.`,
-    teacher: `Сконцентрируйтесь на учениках с низкой динамикой и добавьте больше целевых записей, чтобы AI видел реальную картину класса.`,
-    parent: `Сначала проверьте свежие записи учителя и спокойно закрепите дома предмет с наименьшим текущим результатом.`,
-    admin: `Порталу нужна регулярная публикация событий и достижений, чтобы управленческая картина школы была полной.`
+    student: `�������� �� ������� ������� ${strongest?.subject || "��� ������ ������"} � �������� ${weakest?.subject || "���� ��� �������"} ����� �������� ���������� ��������.`,
+    teacher: `����������������� �� �������� � ������ ��������� � �������� ������ ������� �������, ����� AI ����� �������� ������� ������.`,
+    parent: `������� ��������� ������ ������ ������� � �������� ��������� ���� ������� � ���������� ������� �����������.`,
+    admin: `������� ����� ���������� ���������� ������� � ����������, ����� �������������� ������� ����� ���� ������.`
   };
 
-  return {
-    source: "fallback",
-    text: byRole[role],
-    sections: {
-      diagnosis: `Сильная зона: ${strongest?.subject || "ещё не определена"}. Зона внимания: ${weakest?.subject || "ещё нет данных"}.`,
-      actions: [
-        "Добавить больше реальных записей в портал.",
-        "Пересмотреть динамику через 7 дней.",
-        "Сравнить успеваемость, посещаемость и внеучебные достижения."
+    return {
+      source: "fallback",
+      text: manualContext
+        ? `${byRole[role]} AI ����� ���� ���� ������ ������� ������: ${manualContext.slice(0, 220)}${manualContext.length > 220 ? "..." : ""}`
+        : byRole[role],
+      sections: {
+        diagnosis: `������� ����: ${strongest?.subject || "��� �� ����������"}. ���� ��������: ${weakest?.subject || "��� ��� ������"}.`,
+        actions: [
+        "�������� ������ �������� ������� � ������.",
+        "������������ �������� ����� 7 ����.",
+        "�������� ������������, ������������ � ���������� ����������."
       ],
       outlook: byRole[role]
     }
@@ -265,7 +272,7 @@ function buildFallbackAdvice(payload) {
 
 function ensureActorCanMutate(actor, allowedRoles) {
   if (!actor || !allowedRoles.includes(actor.role)) {
-    return "Недостаточно прав для этого действия.";
+    return "������������ ���� ��� ����� ��������.";
   }
   return null;
 }
@@ -296,19 +303,19 @@ function buildRiskList(users, schoolData) {
       const risks = [];
 
       if (metrics.average !== null && metrics.average < 65) {
-        risks.push(`средний результат ${metrics.average.toFixed(1)}%`);
+        risks.push(`������� ��������� ${metrics.average.toFixed(1)}%`);
       }
 
       if (metrics.absences > 2) {
-        risks.push(`пропусков: ${metrics.absences}`);
+        risks.push(`���������: ${metrics.absences}`);
       }
 
       return {
         studentEmail: student.email,
         studentName: student.fullName,
-        className: student.profile?.className || "Не указан",
+        className: student.profile?.className || "�� ������",
         riskLevel: risks.length === 0 ? "low" : risks.length > 1 ? "high" : "medium",
-        note: risks.length ? risks.join(", ") : "Критических сигналов нет"
+        note: risks.length ? risks.join(", ") : "����������� �������� ���"
       };
     })
     .filter((item) => item.riskLevel !== "low");
@@ -351,14 +358,15 @@ function buildDashboardData(user) {
 
   if (user.role === "student") {
     const metrics = computeStudentMetrics(user.email, schoolData);
+    const latestInsight = getLatestAiInsight(user.email);
 
     return {
       role: "student",
       summary: [
-        { label: "Оценок", value: String(metrics.grades.length) },
-        { label: "Средний результат", value: metrics.average === null ? "Нет данных" : `${metrics.average.toFixed(1)}%` },
-        { label: "Пропусков", value: String(metrics.absences) },
-        { label: "Достижений", value: String(metrics.achievements.length) }
+        { label: "������", value: String(metrics.grades.length) },
+        { label: "������� ���������", value: metrics.average === null ? "��� ������" : `${metrics.average.toFixed(1)}%` },
+        { label: "���������", value: String(metrics.absences) },
+        { label: "����������", value: String(metrics.achievements.length) }
       ],
       records: {
         grades: metrics.grades,
@@ -366,7 +374,8 @@ function buildDashboardData(user) {
         achievements: metrics.achievements,
         riskList: [],
         announcements,
-        events
+        events,
+        latestInsight
       },
       announcements,
       events,
@@ -378,23 +387,25 @@ function buildDashboardData(user) {
     const childEmail = normalizeEmail(user.profile?.childEmail);
     const linkedStudent = users.find((item) => item.email === childEmail && item.role === "student");
     const metrics = computeStudentMetrics(childEmail, schoolData);
+    const latestInsight = linkedStudent ? getLatestAiInsight(childEmail) : null;
 
     return {
       role: "parent",
       summary: [
-        { label: "Ребёнок", value: linkedStudent?.fullName || user.profile?.childName || "Не найден" },
-        { label: "Оценок", value: String(metrics.grades.length) },
-        { label: "Средний результат", value: metrics.average === null ? "Нет данных" : `${metrics.average.toFixed(1)}%` },
-        { label: "Пропусков", value: String(metrics.absences) }
+        { label: "������", value: linkedStudent?.fullName || user.profile?.childName || "�� ������" },
+        { label: "������", value: String(metrics.grades.length) },
+        { label: "������� ���������", value: metrics.average === null ? "��� ������" : `${metrics.average.toFixed(1)}%` },
+        { label: "���������", value: String(metrics.absences) }
       ],
       records: {
         child: linkedStudent ? { fullName: linkedStudent.fullName, className: linkedStudent.profile?.className || "" } : null,
-        grades: metrics.grades,
-        attendance: metrics.attendance,
-        achievements: metrics.achievements,
-        announcements,
-        events
-      },
+          grades: metrics.grades,
+          attendance: metrics.attendance,
+          achievements: metrics.achievements,
+          announcements,
+          events,
+          latestInsight
+        },
       announcements,
       events,
       kioskHighlights
@@ -405,10 +416,10 @@ function buildDashboardData(user) {
     return {
       role: "teacher",
       summary: [
-        { label: "Учеников", value: String(students.length) },
-        { label: "Оценок внесено", value: String(schoolData.grades.length) },
-        { label: "Отметок посещаемости", value: String(schoolData.attendance.length) },
-        { label: "Риск-сигналов", value: String(riskList.length) }
+        { label: "��������", value: String(students.length) },
+        { label: "������ �������", value: String(schoolData.grades.length) },
+        { label: "������� ������������", value: String(schoolData.attendance.length) },
+        { label: "����-��������", value: String(riskList.length) }
       ],
       records: {
         grades: schoolData.grades.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 8),
@@ -428,10 +439,10 @@ function buildDashboardData(user) {
   return {
     role: "admin",
     summary: [
-      { label: "Пользователей", value: String(users.length) },
-      { label: "Новостей", value: String(announcements.length) },
-      { label: "Событий", value: String(events.length) },
-      { label: "Kiosk карточек", value: String(kioskHighlights.length) }
+      { label: "�������������", value: String(users.length) },
+      { label: "��������", value: String(announcements.length) },
+      { label: "�������", value: String(events.length) },
+      { label: "Kiosk ��������", value: String(kioskHighlights.length) }
     ],
     records: {
       grades: schoolData.grades.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 8),
@@ -457,7 +468,7 @@ function handleRegister(payload, res) {
   const users = getUsers();
   const email = normalizeEmail(payload.email);
   if (users.some((user) => user.email === email)) {
-    sendJson(res, 409, { error: "Пользователь с таким email уже существует." });
+    sendJson(res, 409, { error: "������������ � ����� email ��� ����������." });
     return;
   }
 
@@ -480,7 +491,7 @@ function handleRegister(payload, res) {
   createUser(user);
 
   sendJson(res, 201, {
-    message: "Аккаунт создан. Теперь можно войти в портал.",
+    message: "������� ������. ������ ����� ����� � ������.",
     user: sanitizeUser(user)
   });
 }
@@ -491,12 +502,12 @@ function handleLogin(payload, res) {
   const user = getUserByEmail(email);
 
   if (!user || !verifyPassword(password, user.passwordHash)) {
-    sendJson(res, 401, { error: "Неверный email или пароль." });
+    sendJson(res, 401, { error: "�������� email ��� ������." });
     return;
   }
 
   sendJson(res, 200, {
-    message: "Вход выполнен успешно.",
+    message: "���� �������� �������.",
     user: sanitizeUser(user)
   });
 }
@@ -506,7 +517,7 @@ function handleDashboardData(payload, res) {
   sendJson(res, 200, buildDashboardData(user));
 }
 
-function createRecord(payload, res) {
+async function createRecord(payload, res) {
   const actor = payload.actor;
   const type = String(payload.type || "");
   const data = payload.data || {};
@@ -528,7 +539,7 @@ function createRecord(payload, res) {
 
     const student = users.find((item) => item.email === normalizeEmail(data.studentEmail) && item.role === "student");
     if (!student || !data.subject || data.score === undefined || data.maxScore === undefined) {
-      sendJson(res, 400, { error: "Нужны ученик, предмет, балл и максимум баллов." });
+      sendJson(res, 400, { error: "����� ������, �������, ���� � �������� ������." });
       return;
     }
 
@@ -536,17 +547,19 @@ function createRecord(payload, res) {
     const maxScore = Number(data.maxScore);
     const scorePercent = maxScore > 0 ? Number(((score / maxScore) * 100).toFixed(1)) : 0;
 
-    insertGrade({
-      ...baseRecord,
-      studentEmail: student.email,
-      studentName: student.fullName,
+      const recordId = baseRecord.id;
+      insertGrade({
+        ...baseRecord,
+        studentEmail: student.email,
+        studentName: student.fullName,
       subject: String(data.subject).trim(),
       score,
       maxScore,
-      scorePercent,
-      comment: String(data.comment || "").trim()
-    });
-  } else if (type === "attendance") {
+        scorePercent,
+        comment: String(data.comment || "").trim()
+      });
+      await generateAndStoreStudentInsight(student, "grade", recordId);
+    } else if (type === "attendance") {
     const permissionError = ensureActorCanMutate(actor, ["teacher", "admin"]);
     if (permissionError) {
       sendJson(res, 403, { error: permissionError });
@@ -555,19 +568,21 @@ function createRecord(payload, res) {
 
     const student = users.find((item) => item.email === normalizeEmail(data.studentEmail) && item.role === "student");
     if (!student || !data.status || !data.date) {
-      sendJson(res, 400, { error: "Нужны ученик, статус и дата." });
+      sendJson(res, 400, { error: "����� ������, ������ � ����." });
       return;
     }
 
-    insertAttendance({
-      ...baseRecord,
-      studentEmail: student.email,
-      studentName: student.fullName,
-      status: String(data.status).trim(),
-      date: String(data.date).trim(),
-      comment: String(data.comment || "").trim()
-    });
-  } else if (type === "achievement") {
+      const recordId = baseRecord.id;
+      insertAttendance({
+        ...baseRecord,
+        studentEmail: student.email,
+        studentName: student.fullName,
+        status: String(data.status).trim(),
+        date: String(data.date).trim(),
+        comment: String(data.comment || "").trim()
+      });
+      await generateAndStoreStudentInsight(student, "attendance", recordId);
+    } else if (type === "achievement") {
     const permissionError = ensureActorCanMutate(actor, ["teacher", "admin"]);
     if (permissionError) {
       sendJson(res, 403, { error: permissionError });
@@ -576,17 +591,19 @@ function createRecord(payload, res) {
 
     const student = users.find((item) => item.email === normalizeEmail(data.studentEmail) && item.role === "student");
     if (!student || !data.title) {
-      sendJson(res, 400, { error: "Нужны ученик и название достижения." });
+      sendJson(res, 400, { error: "����� ������ � �������� ����������." });
       return;
     }
 
-    insertAchievement({
-      ...baseRecord,
-      studentEmail: student.email,
-      studentName: student.fullName,
-      title: String(data.title).trim(),
-      body: String(data.body || "").trim()
-    });
+      const recordId = baseRecord.id;
+      insertAchievement({
+        ...baseRecord,
+        studentEmail: student.email,
+        studentName: student.fullName,
+        title: String(data.title).trim(),
+        body: String(data.body || "").trim()
+      });
+      await generateAndStoreStudentInsight(student, "achievement", recordId);
   } else if (type === "announcement") {
     const permissionError = ensureActorCanMutate(actor, ["admin"]);
     if (permissionError) {
@@ -595,7 +612,7 @@ function createRecord(payload, res) {
     }
 
     if (!data.title || !data.body) {
-      sendJson(res, 400, { error: "Нужны заголовок и текст объявления." });
+      sendJson(res, 400, { error: "����� ��������� � ����� ����������." });
       return;
     }
 
@@ -613,7 +630,7 @@ function createRecord(payload, res) {
     }
 
     if (!data.title || !data.eventDate) {
-      sendJson(res, 400, { error: "Нужны название события и дата." });
+      sendJson(res, 400, { error: "����� �������� ������� � ����." });
       return;
     }
 
@@ -631,7 +648,7 @@ function createRecord(payload, res) {
     }
 
     if (!data.title) {
-      sendJson(res, 400, { error: "Нужен заголовок для стенгазеты." });
+      sendJson(res, 400, { error: "����� ��������� ��� ����������." });
       return;
     }
 
@@ -641,158 +658,215 @@ function createRecord(payload, res) {
       body: String(data.body || "").trim()
     });
   } else {
-    sendJson(res, 400, { error: "Неизвестный тип записи." });
+    sendJson(res, 400, { error: "����������� ��� ������." });
     return;
   }
-  sendJson(res, 201, { message: "Запись успешно сохранена." });
+  sendJson(res, 201, { message: "������ ������� ���������." });
 }
 
-function deleteRecord(payload, res) {
+async function deleteRecord(payload, res) {
   const actor = payload.actor;
   const type = String(payload.type || "");
   const id = String(payload.id || "");
 
-  const permissionError = ensureActorCanMutate(actor, ["admin"]);
-  if (permissionError) {
-    sendJson(res, 403, { error: permissionError });
-    return;
-  }
-
   if (!id) {
-    sendJson(res, 400, { error: "Не указан идентификатор записи." });
+    sendJson(res, 400, { error: "�� ������ ������������� ������." });
     return;
   }
 
   let result;
-  if (type === "announcement") {
+  if (type === "grade") {
+    const permissionError = ensureActorCanMutate(actor, ["teacher", "admin"]);
+    if (permissionError) {
+      sendJson(res, 403, { error: permissionError });
+      return;
+    }
+
+    const grade = getGradeById(id);
+    if (!grade) {
+      sendJson(res, 404, { error: "Запись не найдена." });
+      return;
+    }
+
+    result = deleteGrade(id);
+
+    if (result.changes) {
+      const student = getUserByEmail(grade.studentEmail);
+      if (student && student.role === "student") {
+        await generateAndStoreStudentInsight(student, "grade_deleted", id);
+      }
+    }
+  } else if (type === "announcement") {
+    const permissionError = ensureActorCanMutate(actor, ["admin"]);
+    if (permissionError) {
+      sendJson(res, 403, { error: permissionError });
+      return;
+    }
     result = deleteAnnouncement(id);
   } else if (type === "event") {
+    const permissionError = ensureActorCanMutate(actor, ["admin"]);
+    if (permissionError) {
+      sendJson(res, 403, { error: permissionError });
+      return;
+    }
     result = deleteEvent(id);
   } else if (type === "kiosk") {
+    const permissionError = ensureActorCanMutate(actor, ["admin"]);
+    if (permissionError) {
+      sendJson(res, 403, { error: permissionError });
+      return;
+    }
     result = deleteKioskHighlight(id);
   } else {
-    sendJson(res, 400, { error: "Удаление для этого типа не поддерживается." });
+    sendJson(res, 400, { error: "�������� ��� ����� ���� �� ��������������." });
     return;
   }
 
   if (!result.changes) {
-    sendJson(res, 404, { error: "Запись не найдена." });
+    sendJson(res, 404, { error: "������ �� �������." });
     return;
   }
 
-  sendJson(res, 200, { message: "Запись удалена." });
+  sendJson(res, 200, { message: "������ �������." });
 }
 
 async function handleAiAdvice(payload, res) {
-  if (!GEMINI_API_KEY && !OPENAI_API_KEY) {
-    sendJson(res, 200, buildFallbackAdvice(payload));
-    return;
-  }
-
-  const prompt = [
-    "Ты AI-наставник школьного портала Aqbobek Lyceum.",
-    `Роль пользователя: ${payload.role || "guest"}.`,
-    `Пользовательский запрос: ${payload.prompt || "Проанализируй текущую ситуацию."}`,
-    `Оценки: ${JSON.stringify(payload.grades || [])}.`,
-    `Посещаемость: ${JSON.stringify(payload.attendance || [])}.`,
-    `Достижения: ${JSON.stringify(payload.achievements || [])}.`,
-    `События: ${JSON.stringify(payload.events || [])}.`,
-    "Дай ответ на русском языке.",
-    "Сделай 3 части с явными заголовками: Диагноз, Действия на неделю, Профориентация.",
-    "В блоке Действия на неделю дай 3 коротких пункта."
-  ].join("\n");
-
-  if (GEMINI_API_KEY) {
-    try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": GEMINI_API_KEY
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: prompt }]
-              }
-            ]
-          })
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        sendJson(res, 502, { error: "Gemini request failed", details: errorText });
-        return;
-      }
-
-      const result = await response.json();
-      const text = (result.candidates || [])
-        .flatMap((candidate) => candidate.content?.parts || [])
-        .map((part) => part.text || "")
-        .join("\n")
-        .trim();
-
-      sendJson(res, 200, {
-        source: "gemini",
-        model: GEMINI_MODEL,
-        text: text || "Gemini не вернул текстовый ответ.",
-        sections: parseAiSections(text)
-      });
-      return;
-    } catch (error) {
-      sendJson(res, 500, {
-        error: "Server error while calling Gemini",
-        details: error instanceof Error ? error.message : String(error)
-      });
-      return;
-    }
-  }
-
   try {
-    const response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: AI_MODEL,
-        input: prompt
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      sendJson(res, 502, { error: "OpenAI request failed", details: errorText });
-      return;
-    }
-
-    const result = await response.json();
-    const text = result.output_text || "AI не вернул текстовый ответ.";
-    sendJson(res, 200, {
-      source: "openai",
-      model: AI_MODEL,
-      text,
-      sections: parseAiSections(text)
-    });
+    const result = await generateAiSections(payload);
+    sendJson(res, 200, result);
   } catch (error) {
     sendJson(res, 500, {
-      error: "Server error while calling OpenAI",
+      error: "Server error while calling AI",
       details: error instanceof Error ? error.message : String(error)
     });
   }
 }
 
+async function generateAiSections(payload) {
+  if (!GEMINI_API_KEY && !OPENAI_API_KEY) {
+    return buildFallbackAdvice(payload);
+  }
+
+  const prompt = [
+    "�� AI-��������� ��������� ������� Aqbobek Lyceum.",
+    `���� ������������: ${payload.role || "guest"}.`,
+    `���������������� ������: ${payload.prompt || "������������� ������� ��������."}`,
+    `������ ������� ������ ������������: ${payload.manualContext || "�� �������������"}.`,
+    `������: ${JSON.stringify(payload.grades || [])}.`,
+    `������������: ${JSON.stringify(payload.attendance || [])}.`,
+    `����������: ${JSON.stringify(payload.achievements || [])}.`,
+    `�������: ${JSON.stringify(payload.events || [])}.`,
+    "��� ����� �� ������� �����.",
+    "���� ������������ ��� ������ �������, ��������� �� ��� ������������ �������� �������.",
+    "������ 3 ����� � ������ �����������: �������, �������� �� ������, ��������������.",
+    "� ����� �������� �� ������ ��� 3 �������� ������."
+  ].join("\n");
+
+  if (GEMINI_API_KEY) {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": GEMINI_API_KEY
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: prompt }]
+            }
+          ]
+        })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Gemini request failed: ${await response.text()}`);
+    }
+
+    const result = await response.json();
+    const text = (result.candidates || [])
+      .flatMap((candidate) => candidate.content?.parts || [])
+      .map((part) => part.text || "")
+      .join("\n")
+      .trim();
+
+    return {
+      source: "gemini",
+      model: GEMINI_MODEL,
+      text: text || "Gemini �� ������ ��������� �����.",
+      sections: parseAiSections(text)
+    };
+  }
+
+  const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: AI_MODEL,
+      input: prompt
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`OpenAI request failed: ${await response.text()}`);
+  }
+
+  const result = await response.json();
+  const text = result.output_text || "AI �� ������ ��������� �����.";
+  return {
+    source: "openai",
+    model: AI_MODEL,
+    text,
+    sections: parseAiSections(text)
+  };
+}
+
+async function generateAndStoreStudentInsight(student, sourceRecordType, sourceRecordId) {
+  const aiResult = await generateAiSections({
+    role: "student",
+    prompt: `������������� ������������� ����� ������ ������� ${student.fullName} � ��� �������� �����.`,
+    grades: getGrades(student.email).map((item) => ({
+      subject: item.subject,
+      scorePercent: item.scorePercent
+    })),
+    attendance: getAttendance(student.email),
+    achievements: getAchievements(student.email),
+    events: getEvents().slice(0, 5)
+  });
+
+  insertAiInsight({
+    id: crypto.randomUUID(),
+    studentEmail: student.email,
+    studentName: student.fullName,
+    sourceRecordType,
+    sourceRecordId,
+    diagnosis: aiResult.sections?.diagnosis || aiResult.text,
+    actions: aiResult.sections?.actions || [],
+    outlook: aiResult.sections?.outlook || "����������� ��������� ��������� ������ �������.",
+    rawText: aiResult.text || "",
+    createdAt: new Date().toISOString()
+  });
+}
+
 async function handlePostJson(req, res, handler) {
   try {
     const payload = JSON.parse(await readBody(req));
-    handler(payload, res);
-  } catch {
-    sendJson(res, 400, { error: "Invalid JSON body" });
+    await handler(payload, res);
+  } catch (error) {
+    if (!res.headersSent) {
+      const message = error instanceof SyntaxError
+        ? "Invalid JSON body"
+        : error instanceof Error
+          ? error.message
+          : "Server error";
+      sendJson(res, error instanceof SyntaxError ? 400 : 500, { error: message });
+    }
   }
 }
 

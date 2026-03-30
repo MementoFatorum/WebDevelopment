@@ -6,7 +6,7 @@
   <title>Aqbobek Lyceum Portal</title>
   <meta
     name="description"
-    content="Единый школьный портал Aqbobek Lyceum с разными дашбордами для ученика, учителя, родителя и администратора."
+    content="������ �������� ������ Aqbobek Lyceum � ������� ���������� ��� �������, �������, �������� � ��������������."
   >
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -14,57 +14,57 @@
   <div class="app">
     <header class="topbar">
       <div class="topbar__left">
-        <button class="menu-button" type="button" aria-label="Открыть меню">☰</button>
+        <button class="menu-button" type="button" aria-label="������� ����">?</button>
         <div class="topbar__brand">
           <strong>Aqbobek Lyceum</strong>
           <span>Unified School Portal</span>
         </div>
       </div>
       <div class="topbar__right">
-        <div class="user-badge" id="active-user">Гость</div>
-        <button class="button button--ghost topbar__button" id="open-auth" type="button">Войти</button>
-        <button class="button button--ghost topbar__button is-hidden" id="logout-button" type="button">Выйти</button>
+        <div class="user-badge" id="active-user">�����</div>
+        <button class="button button--ghost topbar__button" id="open-auth" type="button">�����</button>
+        <button class="button button--ghost topbar__button is-hidden" id="logout-button" type="button">�����</button>
       </div>
     </header>
 
     <div class="workspace">
       <aside class="sidebar">
-        <div class="sidebar__title">Портал</div>
+        <div class="sidebar__title">������</div>
         <nav class="sidebar__nav">
-          <button class="nav-link is-active" data-section="overview">Обзор</button>
-          <button class="nav-link" data-section="records">Записи</button>
-          <button class="nav-link" data-section="manage">Управление</button>
-          <button class="nav-link" data-section="ai">AI-наставник</button>
-          <button class="nav-link" data-section="wall">Стенгазета</button>
+          <button class="nav-link is-active" data-section="overview">�����</button>
+          <button class="nav-link" data-section="records">������</button>
+          <button class="nav-link" data-section="manage">����������</button>
+          <button class="nav-link" data-section="ai">AI-���������</button>
+          <button class="nav-link" data-section="wall">����������</button>
         </nav>
       </aside>
 
       <main class="content">
         <section class="auth-hero" id="auth-hero">
           <div class="auth-hero__copy">
-            <p class="eyebrow">Доступ в систему</p>
-            <h2>У каждого своя роль и свой рабочий экран</h2>
+            <p class="eyebrow">������ � �������</p>
+            <h2>� ������� ���� ���� � ���� ������� �����</h2>
             <p>
-              Учитель и администратор добавляют реальные данные, а ученик и родитель видят
-              только то, что было создано в системе. Без заранее подставленных оценок и фейковых событий.
+              ������� � ������������� ��������� �������� ������, � ������ � �������� �����
+              ������ ��, ��� ���� ������� � �������. ��� ������� ������������� ������ � �������� �������.
             </p>
           </div>
           <div class="auth-hero__actions">
-            <button class="button button--primary" id="open-auth-hero" type="button">Войти или зарегистрироваться</button>
+            <button class="button button--primary" id="open-auth-hero" type="button">����� ��� ������������������</button>
           </div>
         </section>
 
         <section class="hero-strip" id="overview-section">
           <div>
-            <p class="eyebrow">Ролевой дашборд</p>
-            <h1 id="hero-title">Единый портал школьных данных</h1>
+            <p class="eyebrow">������� �������</p>
+            <h1 id="hero-title">������ ������ �������� ������</h1>
             <p id="hero-text">
-              Войдите в систему, чтобы увидеть свой сценарий работы: мониторинг ученика, ведение записей класса,
-              публикацию событий школы или управленческий обзор.
+              ������� � �������, ����� ������� ���� �������� ������: ���������� �������, ������� ������� ������,
+              ���������� ������� ����� ��� �������������� �����.
             </p>
           </div>
           <div class="hero-actions">
-            <button class="button button--primary" id="refresh-ai" type="button">Обновить AI-анализ</button>
+            <button class="button button--primary" id="refresh-ai" type="button">�������� AI-������</button>
             <button class="button button--ghost" id="toggle-kiosk" type="button">Kiosk mode</button>
           </div>
         </section>
@@ -83,21 +83,29 @@
             <div class="panel__head">
               <div>
                 <p class="eyebrow">Gemini / OpenAI API</p>
-                <h3>Персональный AI-наставник</h3>
+                <h3>������������ AI-���������</h3>
               </div>
               <span class="badge badge--dark" id="ai-status">Mock</span>
             </div>
             <form class="ai-form" id="ai-form">
               <textarea
+                id="ai-data-input"
+                rows="4"
+                placeholder="�������� ������� ������ ��� �������: ��������, ���������� 90, 84; ������ 72; ��������� 2; ���� ������, ��� ���������"
+              ></textarea>
+              <textarea
                 id="ai-prompt"
                 rows="4"
-                placeholder="Например: проанализируй текущие записи и предложи план действий на неделю"
+                placeholder="��������: ������������� ������� ������ � �������� ���� �������� �� ������"
               ></textarea>
-              <button class="button button--primary" type="submit">Получить совет</button>
+              <p class="ai-helper">
+                AI ����������� � ������ �� �������, � ���� ������ �������. ����� ��������� ������, ������������, ����������� � ����.
+              </p>
+              <button class="button button--primary" type="submit">�������� �����</button>
             </form>
             <div class="ai-output" id="ai-output">
-              <strong>Что умеет блок</strong>
-              <p>Берёт реальные записи портала по текущему пользователю и формирует структурированные рекомендации.</p>
+              <strong>��� ����� ����</strong>
+              <p>���� �������� ������ ������� �� �������� ������������ � ��������� ����������������� ������������.</p>
             </div>
           </article>
 
@@ -105,7 +113,7 @@
             <div class="panel__head">
               <div>
                 <p class="eyebrow">Kiosk mode</p>
-                <h3>Стенгазета для интерактивной доски</h3>
+                <h3>���������� ��� ������������� �����</h3>
               </div>
             </div>
             <div class="kiosk-feed" id="kiosk-feed"></div>
@@ -121,14 +129,14 @@
       <div class="auth-card__head">
         <div>
           <p class="eyebrow">School access</p>
-          <h3>Вход и регистрация</h3>
+          <h3>���� � �����������</h3>
         </div>
-        <button class="auth-close" id="close-auth" type="button" aria-label="Закрыть">×</button>
+        <button class="auth-close" id="close-auth" type="button" aria-label="�������">?</button>
       </div>
 
       <div class="auth-tabs">
-        <button class="auth-tab is-active" data-auth-tab="login" type="button">Вход</button>
-        <button class="auth-tab" data-auth-tab="register" type="button">Регистрация</button>
+        <button class="auth-tab is-active" data-auth-tab="login" type="button">����</button>
+        <button class="auth-tab" data-auth-tab="register" type="button">�����������</button>
       </div>
 
       <form class="auth-form" id="login-form">
@@ -137,35 +145,35 @@
           <input type="email" name="email" placeholder="name@aqbobek.edu" required>
         </label>
         <label>
-          Пароль
-          <input type="password" name="password" placeholder="Введите пароль" required>
+          ������
+          <input type="password" name="password" placeholder="������� ������" required>
         </label>
-        <button class="button button--primary" type="submit">Войти в портал</button>
+        <button class="button button--primary" type="submit">����� � ������</button>
       </form>
 
       <form class="auth-form is-hidden" id="register-form">
         <label>
-          ФИО
-          <input type="text" name="fullName" placeholder="Полное имя" required>
+          ���
+          <input type="text" name="fullName" placeholder="������ ���" required>
         </label>
         <label>
           Email
           <input type="email" name="email" placeholder="name@aqbobek.edu" required>
         </label>
         <label>
-          Пароль
-          <input type="password" name="password" placeholder="Минимум 6 символов" required>
+          ������
+          <input type="password" name="password" placeholder="������� 6 ��������" required>
         </label>
         <label>
-          Роль
+          ����
           <select name="role" id="register-role" required>
-            <option value="student">Ученик</option>
-            <option value="teacher">Учитель</option>
-            <option value="parent">Родитель</option>
+            <option value="student">������</option>
+            <option value="teacher">�������</option>
+            <option value="parent">��������</option>
           </select>
         </label>
         <div class="auth-role-fields" id="auth-role-fields"></div>
-        <button class="button button--primary" type="submit">Создать аккаунт</button>
+        <button class="button button--primary" type="submit">������� �������</button>
       </form>
 
       <div class="auth-message" id="auth-message" aria-live="polite"></div>
