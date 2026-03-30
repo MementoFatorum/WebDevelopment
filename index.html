@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aqbobek Lyceum Portal</title>
   <meta
     name="description"
-    content="������ �������� ������ Aqbobek Lyceum � ������� ���������� ��� �������, �������, �������� � ��������������."
+    content="Unified school portal for Aqbobek Lyceum with dashboards for students, teachers, parents, and administrators."
   >
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -14,57 +14,57 @@
   <div class="app">
     <header class="topbar">
       <div class="topbar__left">
-        <button class="menu-button" type="button" aria-label="������� ����">?</button>
+        <button class="menu-button" type="button" aria-label="Open menu">Menu</button>
         <div class="topbar__brand">
           <strong>Aqbobek Lyceum</strong>
           <span>Unified School Portal</span>
         </div>
       </div>
       <div class="topbar__right">
-        <div class="user-badge" id="active-user">�����</div>
-        <button class="button button--ghost topbar__button" id="open-auth" type="button">�����</button>
-        <button class="button button--ghost topbar__button is-hidden" id="logout-button" type="button">�����</button>
+        <div class="user-badge" id="active-user">Guest</div>
+        <button class="button button--ghost topbar__button" id="open-auth" type="button">Sign in</button>
+        <button class="button button--ghost topbar__button is-hidden" id="logout-button" type="button">Sign out</button>
       </div>
     </header>
 
     <div class="workspace">
       <aside class="sidebar">
-        <div class="sidebar__title">������</div>
+        <div class="sidebar__title">Portal</div>
         <nav class="sidebar__nav">
-          <button class="nav-link is-active" data-section="overview">�����</button>
-          <button class="nav-link" data-section="records">������</button>
-          <button class="nav-link" data-section="manage">����������</button>
-          <button class="nav-link" data-section="ai">AI-���������</button>
-          <button class="nav-link" data-section="wall">����������</button>
+          <button class="nav-link is-active" data-section="overview">Overview</button>
+          <button class="nav-link" data-section="records">Records</button>
+          <button class="nav-link" data-section="manage">Manage</button>
+          <button class="nav-link" data-section="ai">AI Mentor</button>
+          <button class="nav-link" data-section="wall">Wall</button>
         </nav>
       </aside>
 
       <main class="content">
         <section class="auth-hero" id="auth-hero">
           <div class="auth-hero__copy">
-            <p class="eyebrow">������ � �������</p>
-            <h2>� ������� ���� ���� � ���� ������� �����</h2>
+            <p class="eyebrow">School Access</p>
+            <h2>Each role gets its own dashboard and workflow</h2>
             <p>
-              ������� � ������������� ��������� �������� ������, � ������ � �������� �����
-              ������ ��, ��� ���� ������� � �������. ��� ������� ������������� ������ � �������� �������.
+              Teachers and administrators add real school data. Students and parents only see
+              information that was actually published in the system.
             </p>
           </div>
           <div class="auth-hero__actions">
-            <button class="button button--primary" id="open-auth-hero" type="button">����� ��� ������������������</button>
+            <button class="button button--primary" id="open-auth-hero" type="button">Open sign in / registration</button>
           </div>
         </section>
 
         <section class="hero-strip" id="overview-section">
           <div>
-            <p class="eyebrow">������� �������</p>
-            <h1 id="hero-title">������ ������ �������� ������</h1>
+            <p class="eyebrow">Role Dashboard</p>
+            <h1 id="hero-title">Unified school data portal</h1>
             <p id="hero-text">
-              ������� � �������, ����� ������� ���� �������� ������: ���������� �������, ������� ������� ������,
-              ���������� ������� ����� ��� �������������� �����.
+              Sign in to view a role-based workspace with grades, attendance, achievements, school
+              events, and AI recommendations.
             </p>
           </div>
           <div class="hero-actions">
-            <button class="button button--primary" id="refresh-ai" type="button">�������� AI-������</button>
+            <button class="button button--primary" id="refresh-ai" type="button">Refresh AI advice</button>
             <button class="button button--ghost" id="toggle-kiosk" type="button">Kiosk mode</button>
           </div>
         </section>
@@ -83,7 +83,7 @@
             <div class="panel__head">
               <div>
                 <p class="eyebrow">Gemini / OpenAI API</p>
-                <h3>������������ AI-���������</h3>
+                <h3>Personal AI Mentor</h3>
               </div>
               <span class="badge badge--dark" id="ai-status">Mock</span>
             </div>
@@ -91,21 +91,21 @@
               <textarea
                 id="ai-data-input"
                 rows="4"
-                placeholder="�������� ������� ������ ��� �������: ��������, ���������� 90, 84; ������ 72; ��������� 2; ���� ������, ��� ���������"
+                placeholder="Optional extra input: Mathematics 90, 84; Physics 72; absences 2; help me understand what to improve"
               ></textarea>
               <textarea
                 id="ai-prompt"
                 rows="4"
-                placeholder="��������: ������������� ������� ������ � �������� ���� �������� �� ������"
+                placeholder="Example: Analyze the current student data and suggest a one-week improvement plan"
               ></textarea>
               <p class="ai-helper">
-                AI ����������� � ������ �� �������, � ���� ������ �������. ����� ��������� ������, ������������, ����������� � ����.
+                The AI analyzes portal data first and can also use extra notes that you type in manually.
               </p>
-              <button class="button button--primary" type="submit">�������� �����</button>
+              <button class="button button--primary" type="submit">Get advice</button>
             </form>
             <div class="ai-output" id="ai-output">
-              <strong>��� ����� ����</strong>
-              <p>���� �������� ������ ������� �� �������� ������������ � ��������� ����������������� ������������.</p>
+              <strong>What this block does</strong>
+              <p>It reads real portal records for the current user and generates structured recommendations.</p>
             </div>
           </article>
 
@@ -113,7 +113,7 @@
             <div class="panel__head">
               <div>
                 <p class="eyebrow">Kiosk mode</p>
-                <h3>���������� ��� ������������� �����</h3>
+                <h3>Wall display for school screens</h3>
               </div>
             </div>
             <div class="kiosk-feed" id="kiosk-feed"></div>
@@ -129,14 +129,14 @@
       <div class="auth-card__head">
         <div>
           <p class="eyebrow">School access</p>
-          <h3>���� � �����������</h3>
+          <h3>Sign in and registration</h3>
         </div>
-        <button class="auth-close" id="close-auth" type="button" aria-label="�������">?</button>
+        <button class="auth-close" id="close-auth" type="button" aria-label="Close">Close</button>
       </div>
 
       <div class="auth-tabs">
-        <button class="auth-tab is-active" data-auth-tab="login" type="button">����</button>
-        <button class="auth-tab" data-auth-tab="register" type="button">�����������</button>
+        <button class="auth-tab is-active" data-auth-tab="login" type="button">Sign in</button>
+        <button class="auth-tab" data-auth-tab="register" type="button">Register</button>
       </div>
 
       <form class="auth-form" id="login-form">
@@ -145,35 +145,35 @@
           <input type="email" name="email" placeholder="name@aqbobek.edu" required>
         </label>
         <label>
-          ������
-          <input type="password" name="password" placeholder="������� ������" required>
+          Password
+          <input type="password" name="password" placeholder="Enter password" required>
         </label>
-        <button class="button button--primary" type="submit">����� � ������</button>
+        <button class="button button--primary" type="submit">Sign in</button>
       </form>
 
       <form class="auth-form is-hidden" id="register-form">
         <label>
-          ���
-          <input type="text" name="fullName" placeholder="������ ���" required>
+          Full name
+          <input type="text" name="fullName" placeholder="Full name" required>
         </label>
         <label>
           Email
           <input type="email" name="email" placeholder="name@aqbobek.edu" required>
         </label>
         <label>
-          ������
-          <input type="password" name="password" placeholder="������� 6 ��������" required>
+          Password
+          <input type="password" name="password" placeholder="At least 6 characters" required>
         </label>
         <label>
-          ����
+          Role
           <select name="role" id="register-role" required>
-            <option value="student">������</option>
-            <option value="teacher">�������</option>
-            <option value="parent">��������</option>
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+            <option value="parent">Parent</option>
           </select>
         </label>
         <div class="auth-role-fields" id="auth-role-fields"></div>
-        <button class="button button--primary" type="submit">������� �������</button>
+        <button class="button button--primary" type="submit">Create account</button>
       </form>
 
       <div class="auth-message" id="auth-message" aria-live="polite"></div>

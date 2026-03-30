@@ -164,7 +164,7 @@ async function loadDashboard() {
 
 function updateUserChrome() {
   const label = state.user
-    ? `${state.user.fullName} В· ${roleDisplayName(state.user.role)}`
+    ? `${state.user.fullName} - ${roleDisplayName(state.user.role)}`
     : "Р“РѕСЃС‚СЊ";
 
   elements.activeUser.textContent = label;
@@ -271,7 +271,7 @@ function renderGradesPanel(grades, title = "РћС†РµРЅРєРё") {
             <div class="table-row">
               <div>
                 <strong>${item.subject}</strong>
-                <span>${item.studentName || "РЈС‡РµРЅРёРє"} В· ${formatDate(item.createdAt)}</span>
+                <span>${item.studentName || "РЈС‡РµРЅРёРє"} - ${formatDate(item.createdAt)}</span>
               </div>
               <div><span class="pill pill--blue">${item.score} / ${item.maxScore}</span></div>
               <div><span class="pill ${item.scorePercent >= 75 ? "pill--green" : item.scorePercent >= 60 ? "pill--orange" : "pill--red"}">${item.scorePercent}%</span></div>
@@ -302,7 +302,7 @@ function renderAttendancePanel(attendance) {
         ${attendance
           .map((item) => `
             <article class="feed-item">
-              <strong>${item.studentName || "РЈС‡РµРЅРёРє"} В· ${item.date}</strong>
+              <strong>${item.studentName || "РЈС‡РµРЅРёРє"} - ${item.date}</strong>
               <p>РЎС‚Р°С‚СѓСЃ: ${item.status === "present" ? "РџСЂРёСЃСѓС‚СЃС‚РІРѕРІР°Р»" : item.status === "late" ? "РћРїРѕР·РґР°Р»" : "РћС‚СЃСѓС‚СЃС‚РІРѕРІР°Р»"}${item.comment ? `. ${item.comment}` : ""}</p>
             </article>
           `)
@@ -363,7 +363,7 @@ function renderAchievementsPanel(items) {
             <article class="feed-item">
               <strong>${item.studentName || ""} ${item.title}</strong>
               <p>${item.body || "Р‘РµР· РѕРїРёСЃР°РЅРёСЏ"}</p>
-              <span class="meta-line">Р”РѕР±Р°РІРёР»: ${item.createdByName} В· ${formatDate(item.createdAt)}</span>
+              <span class="meta-line">Р”РѕР±Р°РІРёР»: ${item.createdByName} - ${formatDate(item.createdAt)}</span>
             </article>
           `)
           .join("")}
@@ -389,7 +389,7 @@ function renderRiskPanel(items) {
         ${items
           .map((item) => `
             <article class="feed-item">
-              <strong>${item.studentName} В· ${item.className}</strong>
+              <strong>${item.studentName} - ${item.className}</strong>
               <p>${item.note}</p>
               <span class="meta-line">РЈСЂРѕРІРµРЅСЊ: ${item.riskLevel === "high" ? "Р’С‹СЃРѕРєРёР№" : "РЎСЂРµРґРЅРёР№"}</span>
             </article>
@@ -529,7 +529,7 @@ function buildStudentOptions() {
   }
 
   return students
-    .map((student) => `<option value="${student.email}">${student.fullName}${student.className ? ` В· ${student.className}` : ""}</option>`)
+    .map((student) => `<option value="${student.email}">${student.fullName}${student.className ? ` - ${student.className}` : ""}</option>`)
     .join("");
 }
 
@@ -727,7 +727,7 @@ function renderStoredInsight(insight) {
     return;
   }
 
-  elements.aiStatus.textContent = `Auto В· ${new Date(insight.createdAt).toLocaleString("ru-RU", {
+  elements.aiStatus.textContent = `Auto - ${new Date(insight.createdAt).toLocaleString("ru-RU", {
     day: "2-digit",
     month: "2-digit",
     hour: "2-digit",
@@ -802,9 +802,9 @@ async function requestAiAdvice(customPrompt) {
     });
 
     elements.aiStatus.textContent = result.source === "gemini"
-      ? `Gemini В· ${result.model}`
+      ? `Gemini - ${result.model}`
       : result.source === "openai"
-        ? `OpenAI В· ${result.model}`
+        ? `OpenAI - ${result.model}`
         : "Fallback";
     renderAiResponse(result);
   } catch (error) {
@@ -1066,4 +1066,603 @@ async function init() {
 }
 
 init();
+
+function roleDisplayName(role) {
+  const map = {
+    student: "Student",
+    teacher: "Teacher",
+    parent: "Parent",
+    admin: "Administrator",
+    guest: "Guest"
+  };
+  return map[role] || role;
+}
+
+function renderRoleFields(role) {
+  const templates = {
+    student: `
+      <label>
+        Class
+        <input type="text" name="className" placeholder="9B" required>
+      </label>
+      <label>
+        Student ID
+        <input type="text" name="studentId" placeholder="ST-2026-001" required>
+      </label>
+    `,
+    teacher: `
+      <label>
+        Subject
+        <input type="text" name="subject" placeholder="Mathematics" required>
+      </label>
+      <label>
+        Staff ID
+        <input type="text" name="staffId" placeholder="T-041" required>
+      </label>
+    `,
+    parent: `
+      <label>
+        Child Name
+        <input type="text" name="childName" placeholder="Aliya Nurzhan">
+      </label>
+      <label>
+        Child Email
+        <input type="email" name="childEmail" placeholder="student@aqbobek.edu" required>
+      </label>
+    `
+  };
+
+  elements.authRoleFields.innerHTML = templates[role] || "";
+}
+
+function updateUserChrome() {
+  const label = state.user
+    ? `${state.user.fullName} · ${roleDisplayName(state.user.role)}`
+    : "Guest";
+
+  elements.activeUser.textContent = label;
+  elements.openAuth.classList.toggle("is-hidden", Boolean(state.user));
+  elements.logoutButton.classList.toggle("is-hidden", !state.user);
+  elements.authHero.classList.toggle("is-hidden", Boolean(state.user));
+}
+
+function renderHero() {
+  const content = {
+    guest: {
+      title: "Unified school data portal",
+      text: "Sign in to open a personal workspace and work only with real records from the portal."
+    },
+    student: {
+      title: "Student dashboard",
+      text: "This screen shows only the grades, attendance, and achievements that were actually added by a teacher or administrator."
+    },
+    parent: {
+      title: "Parent dashboard",
+      text: "You see your child's progress through real school records without fake metrics."
+    },
+    teacher: {
+      title: "Teacher dashboard",
+      text: "Add grades, attendance, and achievements for students while the portal builds a complete picture of class progress."
+    },
+    admin: {
+      title: "Administrator dashboard",
+      text: "Publish announcements, events, and kiosk content while monitoring the overall picture across the school."
+    }
+  };
+
+  const role = currentRole();
+  elements.heroTitle.textContent = content[role].title;
+  elements.heroText.textContent = content[role].text;
+}
+
+function renderSummary() {
+  const items = state.dashboard?.summary || [];
+  if (!items.length) {
+    elements.summaryGrid.innerHTML = `
+      <article class="summary-card summary-card--empty">
+        <strong>No personal data yet</strong>
+        <p>After sign-in and the first records in the system, key indicators will appear here.</p>
+      </article>
+    `;
+    return;
+  }
+
+  elements.summaryGrid.innerHTML = items
+    .map((item) => `
+      <article class="summary-card">
+        <span>${item.label}</span>
+        <strong>${item.value}</strong>
+      </article>
+    `)
+    .join("");
+}
+
+function formatDate(value) {
+  if (!value) {
+    return "No date";
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return date.toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function renderGradesPanel(grades, title = "Grades") {
+  const canDelete = ["teacher", "admin"].includes(currentRole());
+
+  if (!grades?.length) {
+    return `
+      <article class="panel">
+        <div class="panel__head"><h3>${title}</h3></div>
+        ${renderEmptyState("No grades yet", "A teacher has not added performance records yet.")}
+      </article>
+    `;
+  }
+
+  return `
+    <article class="panel">
+      <div class="panel__head"><h3>${title}</h3></div>
+      <div class="table-list">
+        ${grades
+          .map((item) => `
+            <div class="table-row">
+              <div>
+                <strong>${item.subject}</strong>
+                <span>${item.studentName || "Student"} · ${formatDate(item.createdAt)}</span>
+              </div>
+              <div><span class="pill pill--blue">${item.score} / ${item.maxScore}</span></div>
+              <div><span class="pill ${item.scorePercent >= 75 ? "pill--green" : item.scorePercent >= 60 ? "pill--orange" : "pill--red"}">${item.scorePercent}%</span></div>
+              <div><span>${item.comment || "No comment"}</span></div>
+              <div>${canDelete ? `<button class="record-delete" type="button" data-delete-type="grade" data-delete-id="${item.id}">Delete</button>` : ""}</div>
+            </div>
+          `)
+          .join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderAttendancePanel(attendance) {
+  if (!attendance?.length) {
+    return `
+      <article class="panel">
+        <div class="panel__head"><h3>Attendance</h3></div>
+        ${renderEmptyState("No attendance records yet", "A teacher has not added attendance records yet.")}
+      </article>
+    `;
+  }
+
+  return `
+    <article class="panel">
+      <div class="panel__head"><h3>Attendance</h3></div>
+      <div class="feed-list">
+        ${attendance
+          .map((item) => `
+            <article class="feed-item">
+              <strong>${item.studentName || "Student"} · ${item.date}</strong>
+              <p>Status: ${item.status === "present" ? "Present" : item.status === "late" ? "Late" : "Absent"}${item.comment ? `. ${item.comment}` : ""}</p>
+            </article>
+          `)
+          .join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderAnnouncementsPanel(items, title = "Announcements") {
+  const canDelete = currentRole() === "admin";
+  if (!items?.length) {
+    return `
+      <article class="panel">
+        <div class="panel__head"><h3>${title}</h3></div>
+        ${renderEmptyState("No publications yet", "An administrator has not added announcements or news yet.")}
+      </article>
+    `;
+  }
+
+  return `
+    <article class="panel">
+      <div class="panel__head"><h3>${title}</h3></div>
+      <div class="feed-list">
+        ${items
+          .map((item) => `
+            <article class="feed-item">
+              <div class="record-head">
+                <strong>${item.title}</strong>
+                ${canDelete ? `<button class="record-delete" type="button" data-delete-type="announcement" data-delete-id="${item.id}">Delete</button>` : ""}
+              </div>
+              <p>${item.body || "No description"}</p>
+              <span class="meta-line">${formatDate(item.createdAt)}</span>
+            </article>
+          `)
+          .join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderAchievementsPanel(items) {
+  if (!items?.length) {
+    return `
+      <article class="panel">
+        <div class="panel__head"><h3>Achievements</h3></div>
+        ${renderEmptyState("No achievements yet", "A teacher or administrator has not added achievements yet.")}
+      </article>
+    `;
+  }
+
+  return `
+    <article class="panel">
+      <div class="panel__head"><h3>Achievements</h3></div>
+      <div class="feed-list">
+        ${items
+          .map((item) => `
+            <article class="feed-item">
+              <strong>${item.studentName || ""} ${item.title}</strong>
+              <p>${item.body || "No description"}</p>
+              <span class="meta-line">Added by: ${item.createdByName} · ${formatDate(item.createdAt)}</span>
+            </article>
+          `)
+          .join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderRiskPanel(items) {
+  if (!items?.length) {
+    return `
+      <article class="panel">
+        <div class="panel__head"><h3>Risk zone</h3></div>
+        ${renderEmptyState("No critical signals", "The current records do not show students in the risk zone.")}
+      </article>
+    `;
+  }
+
+  return `
+    <article class="panel">
+      <div class="panel__head"><h3>Risk zone</h3></div>
+      <div class="feed-list">
+        ${items
+          .map((item) => `
+            <article class="feed-item">
+              <strong>${item.studentName} · ${item.className}</strong>
+              <p>${item.note}</p>
+              <span class="meta-line">Level: ${item.riskLevel === "high" ? "High" : "Medium"}</span>
+            </article>
+          `)
+          .join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderEventsPanel(items) {
+  const canDelete = currentRole() === "admin";
+  if (!items?.length) {
+    return `
+      <article class="panel">
+        <div class="panel__head"><h3>Events</h3></div>
+        ${renderEmptyState("No events yet", "An administrator has not published school events yet.")}
+      </article>
+    `;
+  }
+
+  return `
+    <article class="panel">
+      <div class="panel__head"><h3>Events</h3></div>
+      <div class="feed-list">
+        ${items
+          .map((item) => `
+            <article class="feed-item">
+              <div class="record-head">
+                <strong>${item.title}</strong>
+                ${canDelete ? `<button class="record-delete" type="button" data-delete-type="event" data-delete-id="${item.id}">Delete</button>` : ""}
+              </div>
+              <p>${item.body || "No description"}</p>
+              <span class="meta-line">${item.eventDate}</span>
+            </article>
+          `)
+          .join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderGuestDashboard() {
+  elements.dashboardMain.innerHTML = `
+    <article class="panel">
+      <div class="panel__head"><h3>Welcome</h3></div>
+      ${renderEmptyState("Sign in to continue", "After sign-in you will see a role-based dashboard and real portal data.")}
+    </article>
+  `;
+  elements.dashboardSide.innerHTML = `
+    <article class="panel">
+      <div class="panel__head"><h3>How the portal works</h3></div>
+      <div class="feed-list">
+        <article class="feed-item"><strong>Teacher</strong><p>Adds grades, attendance, and achievements.</p></article>
+        <article class="feed-item"><strong>Administrator</strong><p>Publishes announcements, events, and kiosk materials.</p></article>
+        <article class="feed-item"><strong>Student and Parent</strong><p>See only the real records already entered into the system.</p></article>
+      </div>
+    </article>
+  `;
+}
+
+function renderStudentDashboard(records) {
+  elements.dashboardMain.innerHTML = [
+    renderGradesPanel(records.grades, "My grades"),
+    renderAttendancePanel(records.attendance)
+  ].join("");
+
+  elements.dashboardSide.innerHTML = [
+    renderAchievementsPanel(records.achievements),
+    renderAnnouncementsPanel(records.announcements),
+    renderEventsPanel(records.events)
+  ].join("");
+}
+
+function renderParentDashboard(records) {
+  const childPanel = records.child
+    ? `
+      <article class="panel">
+        <div class="panel__head"><h3>Linked child</h3></div>
+        <div class="feed-item">
+          <strong>${records.child.fullName}</strong>
+          <p>Class: ${records.child.className || "Not specified"}</p>
+        </div>
+      </article>
+    `
+    : `
+      <article class="panel">
+        <div class="panel__head"><h3>Linked child</h3></div>
+        ${renderEmptyState("Child not found", "Check the child's email in the profile and registration data.")}
+      </article>
+    `;
+
+  elements.dashboardMain.innerHTML = [
+    childPanel,
+    renderGradesPanel(records.grades, "Child performance"),
+    renderAttendancePanel(records.attendance)
+  ].join("");
+
+  elements.dashboardSide.innerHTML = [
+    renderAchievementsPanel(records.achievements),
+    renderAnnouncementsPanel(records.announcements),
+    renderEventsPanel(records.events)
+  ].join("");
+}
+
+function renderTeacherDashboard(records) {
+  elements.dashboardMain.innerHTML = [
+    renderRiskPanel(records.riskList),
+    renderGradesPanel(records.grades, "Latest grades"),
+    renderAttendancePanel(records.attendance)
+  ].join("");
+
+  elements.dashboardSide.innerHTML = [
+    renderAchievementsPanel(records.achievements),
+    renderAnnouncementsPanel(records.announcements),
+    renderEventsPanel(records.events)
+  ].join("");
+}
+
+function renderAdminDashboard(records) {
+  elements.dashboardMain.innerHTML = [
+    renderAnnouncementsPanel(records.announcements, "News and announcements"),
+    renderEventsPanel(records.events),
+    renderRiskPanel(records.riskList)
+  ].join("");
+
+  elements.dashboardSide.innerHTML = [
+    renderGradesPanel(records.grades, "Latest grades"),
+    renderAchievementsPanel(records.achievements)
+  ].join("");
+}
+
+function buildStudentOptions() {
+  const students = state.dashboard?.students || [];
+  if (!students.length) {
+    return `<option value="">Register students first</option>`;
+  }
+
+  return students
+    .map((student) => `<option value="${student.email}">${student.fullName}${student.className ? ` · ${student.className}` : ""}</option>`)
+    .join("");
+}
+
+function renderManagementSection() {
+  const role = currentRole();
+  if (role === "guest" || role === "student" || role === "parent") {
+    elements.managementSection.innerHTML = "";
+    return;
+  }
+
+  const studentOptions = buildStudentOptions();
+  const teacherForms = [
+    managementFormCard(
+      "Add grade",
+      `
+        <label>Student<select name="studentEmail" required>${studentOptions}</select></label>
+        <label>Subject<input type="text" name="subject" placeholder="Mathematics" required></label>
+        <div class="manage-form__split">
+          <label>Score<input type="number" name="score" min="0" required></label>
+          <label>Max score<input type="number" name="maxScore" min="1" required></label>
+        </div>
+        <label>Comment<input type="text" name="comment" placeholder="What should be improved"></label>
+      `,
+      "grade",
+      "Save grade"
+    ),
+    managementFormCard(
+      "Mark attendance",
+      `
+        <label>Student<select name="studentEmail" required>${studentOptions}</select></label>
+        <div class="manage-form__split">
+          <label>Date<input type="date" name="date" required></label>
+          <label>Status
+            <select name="status" required>
+              <option value="present">Present</option>
+              <option value="late">Late</option>
+              <option value="absent">Absent</option>
+            </select>
+          </label>
+        </div>
+        <label>Comment<input type="text" name="comment" placeholder="Reason or note"></label>
+      `,
+      "attendance",
+      "Save attendance"
+    ),
+    managementFormCard(
+      "Add achievement",
+      `
+        <label>Student<select name="studentEmail" required>${studentOptions}</select></label>
+        <label>Title<input type="text" name="title" placeholder="Olympiad award" required></label>
+        <label>Description<textarea name="body" rows="3" placeholder="Short description of the achievement"></textarea></label>
+      `,
+      "achievement",
+      "Save achievement"
+    )
+  ];
+
+  const adminForms = [
+    managementFormCard(
+      "Publish announcement",
+      `
+        <label>Title<input type="text" name="title" placeholder="Parent meeting" required></label>
+        <label>Body<textarea name="body" rows="3" placeholder="Announcement text" required></textarea></label>
+        <label>Audience
+          <select name="audience">
+            <option value="school">Whole school</option>
+            <option value="students">Students</option>
+            <option value="parents">Parents</option>
+            <option value="teachers">Teachers</option>
+          </select>
+        </label>
+      `,
+      "announcement",
+      "Publish announcement"
+    ),
+    managementFormCard(
+      "Add event",
+      `
+        <label>Title<input type="text" name="title" placeholder="STEM Week" required></label>
+        <div class="manage-form__split">
+          <label>Date<input type="date" name="eventDate" required></label>
+          <span></span>
+        </div>
+        <label>Description<textarea name="body" rows="3" placeholder="What will happen"></textarea></label>
+      `,
+      "event",
+      "Save event"
+    ),
+    managementFormCard(
+      "Kiosk highlight",
+      `
+        <label>Title<input type="text" name="title" placeholder="Top student of the week" required></label>
+        <label>Description<textarea name="body" rows="3" placeholder="Short text for the public screen"></textarea></label>
+      `,
+      "kiosk",
+      "Save kiosk card"
+    )
+  ];
+
+  elements.managementSection.innerHTML = `
+    <div class="management-header">
+      <p class="eyebrow">Data management</p>
+      <h2>${role === "teacher" ? "Teacher records real class data" : "Administrator manages school publications"}</h2>
+    </div>
+    <div class="management-grid">
+      ${(role === "teacher" ? teacherForms : adminForms).join("")}
+    </div>
+    <div class="manage-feedback" id="manage-feedback" aria-live="polite"></div>
+  `;
+
+  bindManagementForms();
+}
+
+function renderAiResponse(result) {
+  const sections = result?.sections || {};
+  elements.aiStatus.textContent = result?.source ? String(result.source).toUpperCase() : "AI";
+  elements.aiOutput.innerHTML = `
+    <div class="ai-response">
+      <section class="ai-response__section">
+        <h4>Diagnosis</h4>
+        <div class="ai-response__text">${formatAiText(sections.diagnosis || "Not enough data yet.")}</div>
+      </section>
+      <section class="ai-response__section">
+        <h4>Actions for the week</h4>
+        <ol class="ai-response__list">
+          ${(sections.actions || []).map((item) => `<li>${formatAiText(item)}</li>`).join("") || "<li>No concrete actions yet.</li>"}
+        </ol>
+      </section>
+      <section class="ai-response__section">
+        <h4>Outlook</h4>
+        <div class="ai-response__text">${formatAiText(sections.outlook || "Keep adding real records and review the plan again later.")}</div>
+      </section>
+    </div>
+  `;
+}
+
+function renderStoredInsight(insight) {
+  if (!insight) {
+    elements.aiStatus.textContent = "AUTO";
+    elements.aiOutput.innerHTML = `
+      <strong>No automatic analysis yet</strong>
+      <p>When a teacher publishes a grade, attendance mark, or achievement, AI will generate a fresh student analysis automatically.</p>
+    `;
+    return;
+  }
+
+  elements.aiStatus.textContent = "AUTO";
+  renderAiResponse({
+    source: "auto",
+    sections: {
+      diagnosis: insight.diagnosis,
+      actions: insight.actions || [],
+      outlook: insight.outlook
+    }
+  });
+}
+
+function renderKiosk() {
+  const items = state.dashboard?.kioskHighlights || [];
+  if (!items.length) {
+    elements.kioskFeed.innerHTML = renderEmptyState(
+      "Kiosk wall is empty",
+      "An administrator has not added public screen cards yet."
+    );
+    return;
+  }
+
+  elements.kioskFeed.innerHTML = items
+    .map((item) => `
+      <article class="kiosk-card">
+        <div class="record-head">
+          <strong>${item.title}</strong>
+          ${currentRole() === "admin" ? `<button class="record-delete record-delete--dark" type="button" data-delete-type="kiosk" data-delete-id="${item.id}">Delete</button>` : ""}
+        </div>
+        <p>${item.body || "No description"}</p>
+      </article>
+    `)
+    .join("");
+}
+
+async function logoutUser() {
+  state.user = null;
+  state.dashboard = null;
+  clearStoredUser();
+  elements.aiStatus.textContent = "Mock";
+  elements.aiOutput.innerHTML = `
+    <strong>What this block does</strong>
+    <p>It reads real portal records for the current user and generates structured recommendations.</p>
+  `;
+  await loadDashboard();
+}
 
