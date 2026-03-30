@@ -166,6 +166,10 @@ button {
   min-width: 92px;
 }
 
+.kiosk-exit {
+  min-width: 124px;
+}
+
 .auth-hero,
 .hero-strip,
 .summary-card,
@@ -671,6 +675,12 @@ body.kiosk-mode .panel--dark {
   border-radius: 0;
   border: 0;
   box-shadow: none;
+}
+
+body.kiosk-mode .kiosk-exit {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
 }
 
 body.kiosk-mode .kiosk-item strong {

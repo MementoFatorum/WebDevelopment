@@ -303,19 +303,19 @@ function buildRiskList(users, schoolData) {
       const risks = [];
 
       if (metrics.average !== null && metrics.average < 65) {
-        risks.push(`������� ��������� ${metrics.average.toFixed(1)}%`);
+        risks.push(`Low average: ${metrics.average.toFixed(1)}%`);
       }
 
       if (metrics.absences > 2) {
-        risks.push(`���������: ${metrics.absences}`);
+        risks.push(`Absences: ${metrics.absences}`);
       }
 
       return {
         studentEmail: student.email,
         studentName: student.fullName,
-        className: student.profile?.className || "�� ������",
+        className: student.profile?.className || "No class",
         riskLevel: risks.length === 0 ? "low" : risks.length > 1 ? "high" : "medium",
-        note: risks.length ? risks.join(", ") : "����������� �������� ���"
+        note: risks.length ? risks.join(", ") : "No current risk signals"
       };
     })
     .filter((item) => item.riskLevel !== "low");
@@ -363,10 +363,10 @@ function buildDashboardData(user) {
     return {
       role: "student",
       summary: [
-        { label: "������", value: String(metrics.grades.length) },
-        { label: "������� ���������", value: metrics.average === null ? "��� ������" : `${metrics.average.toFixed(1)}%` },
-        { label: "���������", value: String(metrics.absences) },
-        { label: "����������", value: String(metrics.achievements.length) }
+        { label: "Grades", value: String(metrics.grades.length) },
+        { label: "Average score", value: metrics.average === null ? "No data" : `${metrics.average.toFixed(1)}%` },
+        { label: "Absences", value: String(metrics.absences) },
+        { label: "Achievements", value: String(metrics.achievements.length) }
       ],
       records: {
         grades: metrics.grades,
@@ -392,20 +392,20 @@ function buildDashboardData(user) {
     return {
       role: "parent",
       summary: [
-        { label: "������", value: linkedStudent?.fullName || user.profile?.childName || "�� ������" },
-        { label: "������", value: String(metrics.grades.length) },
-        { label: "������� ���������", value: metrics.average === null ? "��� ������" : `${metrics.average.toFixed(1)}%` },
-        { label: "���������", value: String(metrics.absences) }
+        { label: "Student", value: linkedStudent?.fullName || user.profile?.childName || "Not linked" },
+        { label: "Grades", value: String(metrics.grades.length) },
+        { label: "Average score", value: metrics.average === null ? "No data" : `${metrics.average.toFixed(1)}%` },
+        { label: "Absences", value: String(metrics.absences) }
       ],
       records: {
         child: linkedStudent ? { fullName: linkedStudent.fullName, className: linkedStudent.profile?.className || "" } : null,
-          grades: metrics.grades,
-          attendance: metrics.attendance,
-          achievements: metrics.achievements,
-          announcements,
-          events,
-          latestInsight
-        },
+        grades: metrics.grades,
+        attendance: metrics.attendance,
+        achievements: metrics.achievements,
+        announcements,
+        events,
+        latestInsight
+      },
       announcements,
       events,
       kioskHighlights
@@ -416,10 +416,10 @@ function buildDashboardData(user) {
     return {
       role: "teacher",
       summary: [
-        { label: "��������", value: String(students.length) },
-        { label: "������ �������", value: String(schoolData.grades.length) },
-        { label: "������� ������������", value: String(schoolData.attendance.length) },
-        { label: "����-��������", value: String(riskList.length) }
+        { label: "Students", value: String(students.length) },
+        { label: "Grade records", value: String(schoolData.grades.length) },
+        { label: "Attendance records", value: String(schoolData.attendance.length) },
+        { label: "Risk cases", value: String(riskList.length) }
       ],
       records: {
         grades: schoolData.grades.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 8),
@@ -439,10 +439,10 @@ function buildDashboardData(user) {
   return {
     role: "admin",
     summary: [
-      { label: "�������������", value: String(users.length) },
-      { label: "��������", value: String(announcements.length) },
-      { label: "�������", value: String(events.length) },
-      { label: "Kiosk ��������", value: String(kioskHighlights.length) }
+      { label: "Users", value: String(users.length) },
+      { label: "Announcements", value: String(announcements.length) },
+      { label: "Events", value: String(events.length) },
+      { label: "Kiosk cards", value: String(kioskHighlights.length) }
     ],
     records: {
       grades: schoolData.grades.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 8),
@@ -1040,6 +1040,15 @@ function ensureActorCanMutate(actor, allowedRoles) {
   return null;
 }
 
+function triggerStudentInsightInBackground(student, sourceRecordType, sourceRecordId) {
+  generateAndStoreStudentInsight(student, sourceRecordType, sourceRecordId).catch((error) => {
+    console.error(
+      `Failed to refresh AI insight for ${student.email} after ${sourceRecordType}:`,
+      error
+    );
+  });
+}
+
 function handleRegister(payload, res) {
   const error = validateRegistration(payload);
   if (error) {
@@ -1135,7 +1144,7 @@ async function createRecord(payload, res) {
       scorePercent,
       comment: String(data.comment || "").trim()
     });
-    await generateAndStoreStudentInsight(student, "grade", recordId);
+    triggerStudentInsightInBackground(student, "grade", recordId);
   } else if (type === "attendance") {
     const permissionError = ensureActorCanMutate(actor, ["teacher", "admin"]);
     if (permissionError) {
@@ -1158,7 +1167,7 @@ async function createRecord(payload, res) {
       date: String(data.date).trim(),
       comment: String(data.comment || "").trim()
     });
-    await generateAndStoreStudentInsight(student, "attendance", recordId);
+    triggerStudentInsightInBackground(student, "attendance", recordId);
   } else if (type === "achievement") {
     const permissionError = ensureActorCanMutate(actor, ["teacher", "admin"]);
     if (permissionError) {
@@ -1180,7 +1189,7 @@ async function createRecord(payload, res) {
       title: String(data.title).trim(),
       body: String(data.body || "").trim()
     });
-    await generateAndStoreStudentInsight(student, "achievement", recordId);
+    triggerStudentInsightInBackground(student, "achievement", recordId);
   } else if (type === "announcement") {
     const permissionError = ensureActorCanMutate(actor, ["admin"]);
     if (permissionError) {
@@ -1271,7 +1280,7 @@ async function deleteRecord(payload, res) {
     if (result.changes) {
       const student = getUserByEmail(grade.studentEmail);
       if (student && student.role === "student") {
-        await generateAndStoreStudentInsight(student, "grade_deleted", id);
+        triggerStudentInsightInBackground(student, "grade_deleted", id);
       }
     }
   } else if (type === "announcement") {

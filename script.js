@@ -33,6 +33,7 @@ const elements = {
   aiStatus: document.querySelector("#ai-status"),
   refreshAi: document.querySelector("#refresh-ai"),
   toggleKiosk: document.querySelector("#toggle-kiosk"),
+  exitKiosk: document.querySelector("#exit-kiosk"),
   kioskFeed: document.querySelector("#kiosk-feed"),
   navLinks: document.querySelectorAll(".nav-link")
 };
@@ -1022,6 +1023,8 @@ function stopKioskAutoScroll() {
 function toggleKioskMode() {
   state.kioskMode = !state.kioskMode;
   document.body.classList.toggle("kiosk-mode", state.kioskMode);
+  elements.exitKiosk?.classList.toggle("is-hidden", !state.kioskMode);
+  elements.toggleKiosk.textContent = state.kioskMode ? "Back to dashboard" : "Kiosk mode";
   if (state.kioskMode) {
     startKioskAutoScroll();
   } else {
@@ -1049,6 +1052,7 @@ function bindEvents() {
     await requestAiAdvice("РџСЂРѕР°РЅР°Р»РёР·РёСЂСѓР№ С‚РµРєСѓС‰РёРµ РґР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Рё РІС‹РґРµР»Рё Р±Р»РёР¶Р°Р№С€РёРµ РґРµР№СЃС‚РІРёСЏ.");
   });
   elements.toggleKiosk?.addEventListener("click", toggleKioskMode);
+  elements.exitKiosk?.addEventListener("click", toggleKioskMode);
   document.addEventListener("click", handleDocumentClick);
   elements.navLinks.forEach((link) => {
     link.addEventListener("click", () => {
